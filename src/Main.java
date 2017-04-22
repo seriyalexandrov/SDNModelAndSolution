@@ -18,6 +18,7 @@ public class Main {
 
         PrintWriter printWriter = new PrintWriter(System.out);
         createMatrix();
+
         Utils.printMatrix(matrix, i1Len, i2Len);
 
         // Введем вектор значений неизвестных на предыдущей итерации,
@@ -98,22 +99,32 @@ public class Main {
 
     private static void fillLeftPartCoefficientForState(int i1, int i2) {
         //Заполняем значение в столбце левой части
-        matrix[index(i1, i2)][size] = lambda * drop.p1(i1) + alpha*I.alpha(i1) + beta*I.beta(i2);
+        matrix[index(i1, i2)][size] = lambda * (1 - drop.p1(i1)) + alpha*I.i1(i1) + beta*I.i2(i2);
     }
 
     private static void fillRightPartCoefficientsForState(int i1, int i2) {
         for(int i1state = 0; i1state <= i1Len; i1state++) {
             for(int i2state = 0; i2state <= i2Len; i2state++) {
-                setZeroIfExactlyZeroCoefficient(i1, i2, i1state, i2state);
-            }
-        }
-    }
 
-    private static void setZeroIfExactlyZeroCoefficient(int i1, int i2, int i1state, int i2state) {
-        if (i1state == i1 && i2state == i2 || //Or indexes are the same as the state
-                Math.abs(i1 - i1state) > 1 || //Or difference between states is more than 1.
-                Math.abs(i2 - i2state) > 1 ) {
-            matrix[index(i1, i2)][index(i1state, i2state)] = 0.0;
+                if (i1state == i1 && i2state == i2 || //Or indexes are the same as the state
+                        Math.abs(i1 - i1state) > 1 || //Or difference between states is more than 1.
+                        Math.abs(i2 - i2state) > 1 ||
+                        (i1state == i1 - 1 && i2state == i2 - 1) || // Или два события одновременно, что невозможно
+                        (i1state == i1 + 1 && i1state == i2 + 1) ||
+                        (i1state == i1 && i2state == i2 - 1) ) { //Пришел новый пакет во вторую очередь, причем в первой не поубавилось - невозможно
+                    matrix[index(i1, i2)][index(i1state, i2state)] = 0.0;
+                } else if (i1state == i1 - 1 && i2state == i2) { // Поступил внешний пакет, причем он не был отброшен
+                    matrix[index(i1, i2)][index(i1state, i2state)] = lambda*(1-drop.p1(i1));
+                } else if (i1state == i1 + 1 && i2state == i2) { // Прошла обработка на коммутаторе и пакет ушел из системы либо не ушел из системы, но был сброшен на второй очереди
+                    matrix[index(i1, i2)][index(i1state, i2state)] = alpha*q + alpha*(1-q)*drop.p2(i2);
+                } else if (i1state == i1 && i2state == i2 + 1) { //Прошла обработка на контроллере и пакет попал на коммутатор, но был сброшен
+                    matrix[index(i1, i2)][index(i1state, i2state)] = beta*drop.p1(i1);
+                } else if (i1state == i1 - 1 && i2state == i2 + 1) { //Прошла обработка на контроллере и пакет попал на коммутатор
+                    matrix[index(i1, i2)][index(i1state, i2state)] = beta*drop.p1(i1);
+                } else if (i1state == i1 + 1 && i2state == i2 - 1) { //Прошла обработка на коммутаторе и пакет ушел на контроллер
+                    matrix[index(i1, i2)][index(i1state, i2state)] = alpha*(1-q)*(1-drop.p2(i2));
+                }
+            }
         }
     }
 
