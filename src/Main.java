@@ -15,7 +15,8 @@ public class Main {
     public static void main(String[] args) {
         createMatrix();
         Utils.printMatrix(matrix, i1Len, i2Len);
-        calcGaussZeidel();
+//        calcGaussZeidel();
+        gauss();
     }
 
     private static void createMatrix() {
@@ -129,5 +130,35 @@ public class Main {
         }
         Utils.printResult(previousVariableValues);
         Utils.validateResult(previousVariableValues);
+    }
+
+    private static void gauss() {
+
+        double[] results = new double[size];
+        for (int i = 0; i < size - 1; i++) {
+            double diviver = matrix[i][i];
+
+            Utils.printMatrix(matrix, i1Len, i2Len);
+            System.out.println();
+            for (int j = i + 1; j < size; j++) {
+                double multiplyier = matrix[j][i];
+                double coefficient = multiplyier / diviver;
+                for (int k = i + 1; k < size + 1; k++) {
+                    matrix[j][k] -= matrix[i][k] * coefficient;
+
+                }
+                matrix[j][i] = 0;
+            }
+        }
+
+        for (int i = size - 1; i > -1; i--) {
+            results[i] = matrix[i][size];
+            for (int j = i + 1; j < size; j++) {
+                results[i] -= matrix[i][j] * results[j];
+            }
+            results[i] /= matrix[i][i];
+        }
+
+        Utils.printResult(results);
     }
 }
