@@ -5,12 +5,12 @@ public class Main {
     private static double[][] matrix;
 
     static double lambda = 5;
-    static double alpha = 4;
+    static double alpha = 3;
     static double beta = 2;
     static double q = 0.5; // Вероятность ухода пакета из системы
     static int i1Len = 3; //состояние - длина первой очереди + количество в обработке на коммутаторе. 1 - один на обработке. 2 - 1 в очереди, один в обработке
     static int i2Len = 3; //состояние - длина второй очереди + количество в обработке на контроллере. 1 - один на обработке. 2 - 1 в очереди, один в обработке
-    static double epsilon = 0.00001; //необходимая точность
+    static double epsilon = 0.0001; //необходимая точность
     static int size = (i1Len+1) * (i2Len+1); //вычисляем размерность матрицы
     static Drop drop = new Drop(i1Len, i2Len);
 
@@ -106,11 +106,17 @@ public class Main {
         for(int i1state = 0; i1state <= i1Len; i1state++) {
             for(int i2state = 0; i2state <= i2Len; i2state++) {
 
+//                if (i1 == 0 &&
+//                        i2 == 0 &&
+//                        i1state == 1 &&
+//                        i2state == 0) {
+//                    Utils.printState(i1, i2, i1state, i2state, drop);
+//                }
                 if (i1state == i1 && i2state == i2 || //Or indexes are the same as the state
                         Math.abs(i1 - i1state) > 1 || //Or difference between states is more than 1.
                         Math.abs(i2 - i2state) > 1 ||
                         (i1state == i1 - 1 && i2state == i2 - 1) || // Или два события одновременно, что невозможно
-                        (i1state == i1 + 1 && i1state == i2 + 1) ||
+                        (i1state == i1 + 1 && i2state == i2 + 1) ||
                         (i1state == i1 && i2state == i2 - 1) ) { //Пришел новый пакет во вторую очередь, причем в первой не поубавилось - невозможно
                     matrix[index(i1, i2)][index(i1state, i2state)] = 0.0;
                 } else if (i1state == i1 - 1 && i2state == i2) { // Поступил внешний пакет, причем он не был отброшен
@@ -123,6 +129,9 @@ public class Main {
                     matrix[index(i1, i2)][index(i1state, i2state)] = beta*drop.p1(i1);
                 } else if (i1state == i1 + 1 && i2state == i2 - 1) { //Прошла обработка на коммутаторе и пакет ушел на контроллер
                     matrix[index(i1, i2)][index(i1state, i2state)] = alpha*(1-q)*(1-drop.p2(i2));
+                } else {
+                    Utils.printState(i1, i2, i1state, i2state, drop);
+                    throw new IllegalStateException("Unknown state");
                 }
             }
         }
