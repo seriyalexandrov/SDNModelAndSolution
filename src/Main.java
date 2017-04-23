@@ -1,4 +1,4 @@
-import java.io.PrintWriter;
+import java.util.Arrays;
 
 public class Main {
 
@@ -8,25 +8,81 @@ public class Main {
     static double alpha = 3;
     static double beta = 2;
     static double q = 0.5; // Вероятность ухода пакета из системы
-    static int i1Len = 2; //состояние - длина первой очереди + количество в обработке на коммутаторе. 1 - один на обработке. 2 - 1 в очереди, один в обработке
-    static int i2Len = 2; //состояние - длина второй очереди + количество в обработке на контроллере. 1 - один на обработке. 2 - 1 в очереди, один в обработке
+    static int i1Len = 10; //состояние - длина первой очереди + количество в обработке на коммутаторе. 1 - один на обработке. 2 - 1 в очереди, один в обработке
+    static int i2Len = 10; //состояние - длина второй очереди + количество в обработке на контроллере. 1 - один на обработке. 2 - 1 в очереди, один в обработке
     static double epsilon = 0.0001; //необходимая точность
-    static int size = (i1Len+1) * (i2Len+1); //вычисляем размерность матрицы
+    static int size = (i1Len + 1) * (i2Len + 1); //вычисляем размерность матрицы
     static Drop drop = new Drop(i1Len, i2Len);
 
     public static void main(String[] args) {
-
-        PrintWriter printWriter = new PrintWriter(System.out);
         createMatrix();
+//        Utils.printMatrix(matrix, i1Len, i2Len);
+        calcGaussZeidel();
+    }
 
-        Utils.printMatrix(matrix, i1Len, i2Len);
+    private static void createMatrix() {
+        matrix = new double[size][size + 1];
+        for (int i1 = 0; i1 <= i1Len; i1++) {
+            for (int i2 = 0; i2 <= i2Len; i2++) {
+                fillRightPartCoefficientsForState(i1, i2);
+                fillLeftPartCoefficientForState(i1, i2);
+            }
+        }
+    }
+
+    private static void fillLeftPartCoefficientForState(int i1, int i2) {
+        //Заполняем значение в столбце левой части
+        matrix[index(i1, i2)][size] = 0;
+    }
+
+    private static void fillRightPartCoefficientsForState(int i1, int i2) {
+        for (int i1state = 0; i1state <= i1Len; i1state++) {
+            for (int i2state = 0; i2state <= i2Len; i2state++) {
+
+//                if (i1 == 0 &&
+//                        i2 == 0 &&
+//                        i1state == 1 &&
+//                        i2state == 0) {
+//                    Utils.printState(i1, i2, i1state, i2state, drop);
+//                }
+                if (Math.abs(i1 - i1state) > 1 || //Or difference between states is more than 1.
+                        Math.abs(i2 - i2state) > 1 ||
+                        (i1state == i1 - 1 && i2state == i2 - 1) || // Или два события одновременно, что невозможно
+                        (i1state == i1 + 1 && i2state == i2 + 1) ||
+                        (i1state == i1 && i2state == i2 - 1)) { //Пришел новый пакет во вторую очередь, причем в первой не поубавилось - невозможно
+                    matrix[index(i1, i2)][index(i1state, i2state)] = 0.0;
+                } else if (i1state == i1 && i2state == i2) {
+                    matrix[index(i1, i2)][index(i1state, i2state)] = -(lambda * (1 - drop.p1(i1)) + alpha * I.i1(i1) + beta * I.i2(i2));
+                } else if (i1state == i1 - 1 && i2state == i2) { // Поступил внешний пакет, причем он не был отброшен
+                    matrix[index(i1, i2)][index(i1state, i2state)] = lambda * (1 - drop.p1(i1state));
+                } else if (i1state == i1 + 1 && i2state == i2) { // Прошла обработка на коммутаторе и пакет ушел из системы либо не ушел из системы, но был сброшен на второй очереди
+                    matrix[index(i1, i2)][index(i1state, i2state)] = alpha * q + alpha * (1 - q) * drop.p2(i2state);
+                } else if (i1state == i1 && i2state == i2 + 1) { //Прошла обработка на контроллере и пакет попал на коммутатор, но был сброшен
+                    matrix[index(i1, i2)][index(i1state, i2state)] = beta * drop.p1(i1state);
+                } else if (i1state == i1 - 1 && i2state == i2 + 1) { //Прошла обработка на контроллере и пакет попал на коммутатор
+                    matrix[index(i1, i2)][index(i1state, i2state)] = beta * (1 - drop.p1(i1state));
+                } else if (i1state == i1 + 1 && i2state == i2 - 1) { //Прошла обработка на коммутаторе и пакет ушел на контроллер
+                    matrix[index(i1, i2)][index(i1state, i2state)] = alpha * (1 - q) * (1 - drop.p2(i2state));
+                } else {
+                    Utils.printState(i1, i2, i1state, i2state, drop);
+                    throw new IllegalStateException("Unknown state");
+                }
+            }
+        }
+    }
+
+    private static int index(int i1, int i2) {
+        return i1 * (i2Len + 1) + i2;
+    }
+
+    private static void calcGaussZeidel() {
 
         // Введем вектор значений неизвестных на предыдущей итерации,
         // размер которого равен числу строк в матрице, т.е. size,
         // причем согласно методу изначально заполняем его нулями
         double[] previousVariableValues = new double[size];
         for (int i = 0; i < size; i++) {
-            previousVariableValues[i] = 0.0;
+            previousVariableValues[i] = 1.0;
         }
 
         // Будем выполнять итерационный процесс до тех пор,
@@ -78,66 +134,25 @@ public class Main {
             // становятся значениями на предыдущей итерации
             previousVariableValues = currentVariableValues;
         }
-
-        // Выводим найденные значения неизвестных
-        for (int i = 0; i < size; i++) {
-            printWriter.print(previousVariableValues[i] + " ");
-        }
-
-        printWriter.close();
+        Utils.printResult(previousVariableValues);
     }
 
-    private static void createMatrix() {
-        matrix = new double[size][size+1];
-        for(int i1 = 0; i1 <= i1Len; i1++) {
-            for(int i2 = 0; i2 <= i2Len; i2++) {
-                fillRightPartCoefficientsForState(i1, i2);
-                fillLeftPartCoefficientForState(i1, i2);
-            }
-        }
-    }
-
-    private static void fillLeftPartCoefficientForState(int i1, int i2) {
-        //Заполняем значение в столбце левой части
-        matrix[index(i1, i2)][size] = lambda * (1 - drop.p1(i1)) + alpha*I.i1(i1) + beta*I.i2(i2);
-    }
-
-    private static void fillRightPartCoefficientsForState(int i1, int i2) {
-        for(int i1state = 0; i1state <= i1Len; i1state++) {
-            for(int i2state = 0; i2state <= i2Len; i2state++) {
-
-//                if (i1 == 0 &&
-//                        i2 == 0 &&
-//                        i1state == 1 &&
-//                        i2state == 0) {
-//                    Utils.printState(i1, i2, i1state, i2state, drop);
-//                }
-                if (i1state == i1 && i2state == i2 || //Or indexes are the same as the state
-                        Math.abs(i1 - i1state) > 1 || //Or difference between states is more than 1.
-                        Math.abs(i2 - i2state) > 1 ||
-                        (i1state == i1 - 1 && i2state == i2 - 1) || // Или два события одновременно, что невозможно
-                        (i1state == i1 + 1 && i2state == i2 + 1) ||
-                        (i1state == i1 && i2state == i2 - 1) ) { //Пришел новый пакет во вторую очередь, причем в первой не поубавилось - невозможно
-                    matrix[index(i1, i2)][index(i1state, i2state)] = 0.0;
-                } else if (i1state == i1 - 1 && i2state == i2) { // Поступил внешний пакет, причем он не был отброшен
-                    matrix[index(i1, i2)][index(i1state, i2state)] = lambda*(1-drop.p1(i1));
-                } else if (i1state == i1 + 1 && i2state == i2) { // Прошла обработка на коммутаторе и пакет ушел из системы либо не ушел из системы, но был сброшен на второй очереди
-                    matrix[index(i1, i2)][index(i1state, i2state)] = alpha*q + alpha*(1-q)*drop.p2(i2);
-                } else if (i1state == i1 && i2state == i2 + 1) { //Прошла обработка на контроллере и пакет попал на коммутатор, но был сброшен
-                    matrix[index(i1, i2)][index(i1state, i2state)] = beta*drop.p1(i1);
-                } else if (i1state == i1 - 1 && i2state == i2 + 1) { //Прошла обработка на контроллере и пакет попал на коммутатор
-                    matrix[index(i1, i2)][index(i1state, i2state)] = beta*(1 - drop.p1(i1));
-                } else if (i1state == i1 + 1 && i2state == i2 - 1) { //Прошла обработка на коммутаторе и пакет ушел на контроллер
-                    matrix[index(i1, i2)][index(i1state, i2state)] = alpha*(1-q)*(1-drop.p2(i2));
-                } else {
-                    Utils.printState(i1, i2, i1state, i2state, drop);
-                    throw new IllegalStateException("Unknown state");
+    private static void replaceMatrixRowsToMakeNonNullDiagonal() {
+        double[][] replaced = new double[size][size + 1];
+        for (int x = 0; x < size; x++) {
+            for (int y = 0; y < size; y++) {
+                if (matrix[y][x] != 0) {
+                    System.arraycopy(matrix[y], 0, replaced[x], 0, size+1);
+                    Arrays.fill(matrix[y], 0);
                 }
             }
         }
-    }
+        Utils.printMatrix(replaced, i1Len, i2Len);
 
-    private static int index(int i1, int i2) {
-        return i1*(i2Len + 1) + i2;
+        for (int x = 0; x < size; x++) {
+            System.arraycopy(replaced[x], 0, matrix[x], 0, size + 1);
+        }
+
+        Utils.printMatrix(matrix, i1Len, i2Len);
     }
 }

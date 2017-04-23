@@ -27,6 +27,13 @@ public class Utils {
         if (interationCounter++ > 10000) throw new IllegalStateException("Infinite cycle!");
     }
 
+    public static void printResult(double[] res) {
+        for (double e : res) {
+            System.out.print(e + " ");
+        }
+        System.out.println();
+    }
+
     public static void printState(int i1, int i2, int i1state, int i2state, Drop drop) {
         System.out.println("from state (" + i1state + ", " + i2state + ") to state (" + i1 + ", " + i2+ ")");
         System.out.println("pDrop1 = " + drop.p1(i1) + " treshold = " + drop.i1Treshold + " maxLen = " + drop.i1Max);
