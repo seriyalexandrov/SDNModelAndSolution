@@ -1,5 +1,3 @@
-import java.util.Arrays;
-
 public class Main {
 
     private static double[][] matrix;
@@ -8,15 +6,15 @@ public class Main {
     static double alpha = 3;
     static double beta = 2;
     static double q = 0.5; // Вероятность ухода пакета из системы
-    static int i1Len = 10; //состояние - длина первой очереди + количество в обработке на коммутаторе. 1 - один на обработке. 2 - 1 в очереди, один в обработке
-    static int i2Len = 10; //состояние - длина второй очереди + количество в обработке на контроллере. 1 - один на обработке. 2 - 1 в очереди, один в обработке
-    static double epsilon = 0.0001; //необходимая точность
+    static int i1Len = 3; //состояние - длина первой очереди + количество в обработке на коммутаторе. 1 - один на обработке. 2 - 1 в очереди, один в обработке
+    static int i2Len = 3; //состояние - длина второй очереди + количество в обработке на контроллере. 1 - один на обработке. 2 - 1 в очереди, один в обработке
+    static double epsilon = 0.00000000001; //необходимая точность
     static int size = (i1Len + 1) * (i2Len + 1); //вычисляем размерность матрицы
     static Drop drop = new Drop(i1Len, i2Len);
 
     public static void main(String[] args) {
         createMatrix();
-//        Utils.printMatrix(matrix, i1Len, i2Len);
+        Utils.printMatrix(matrix, i1Len, i2Len);
         calcGaussZeidel();
     }
 
@@ -28,6 +26,7 @@ public class Main {
                 fillLeftPartCoefficientForState(i1, i2);
             }
         }
+        Utils.checkMatrixColoumnSumIsZero(matrix, size);
     }
 
     private static void fillLeftPartCoefficientForState(int i1, int i2) {
@@ -39,12 +38,6 @@ public class Main {
         for (int i1state = 0; i1state <= i1Len; i1state++) {
             for (int i2state = 0; i2state <= i2Len; i2state++) {
 
-//                if (i1 == 0 &&
-//                        i2 == 0 &&
-//                        i1state == 1 &&
-//                        i2state == 0) {
-//                    Utils.printState(i1, i2, i1state, i2state, drop);
-//                }
                 if (Math.abs(i1 - i1state) > 1 || //Or difference between states is more than 1.
                         Math.abs(i2 - i2state) > 1 ||
                         (i1state == i1 - 1 && i2state == i2 - 1) || // Или два события одновременно, что невозможно
@@ -135,24 +128,6 @@ public class Main {
             previousVariableValues = currentVariableValues;
         }
         Utils.printResult(previousVariableValues);
-    }
-
-    private static void replaceMatrixRowsToMakeNonNullDiagonal() {
-        double[][] replaced = new double[size][size + 1];
-        for (int x = 0; x < size; x++) {
-            for (int y = 0; y < size; y++) {
-                if (matrix[y][x] != 0) {
-                    System.arraycopy(matrix[y], 0, replaced[x], 0, size+1);
-                    Arrays.fill(matrix[y], 0);
-                }
-            }
-        }
-        Utils.printMatrix(replaced, i1Len, i2Len);
-
-        for (int x = 0; x < size; x++) {
-            System.arraycopy(replaced[x], 0, matrix[x], 0, size + 1);
-        }
-
-        Utils.printMatrix(matrix, i1Len, i2Len);
+        Utils.validateResult(previousVariableValues);
     }
 }

@@ -29,14 +29,34 @@ public class Utils {
 
     public static void printResult(double[] res) {
         for (double e : res) {
-            System.out.print(e + " ");
+            System.out.printf("%3.8f ", e);
         }
         System.out.println();
+    }
+
+    public static void validateResult(double[] res) {
+        double s = 0;
+        for (double e : res) {
+            s += e;
+        }
+        if (Math.abs(s - 1) > 0.001) throw new IllegalStateException("Result is not consistent: " + s);
     }
 
     public static void printState(int i1, int i2, int i1state, int i2state, Drop drop) {
         System.out.println("from state (" + i1state + ", " + i2state + ") to state (" + i1 + ", " + i2+ ")");
         System.out.println("pDrop1 = " + drop.p1(i1) + " treshold = " + drop.i1Treshold + " maxLen = " + drop.i1Max);
         System.out.println("pDrop2 = " + drop.p2(i2));
+    }
+
+    public static void checkMatrixColoumnSumIsZero(double[][] matrix, int size) {
+        for (int col = 0; col < size; col++) {
+            double sum = 0;
+            for (int row = 0; row < size; row++) {
+                sum += matrix[row][col];
+            }
+            if (Math.abs(sum) > 0.001) {
+                throw new IllegalStateException("Column " + col + " has non zero sum");
+            }
+        }
     }
 }
