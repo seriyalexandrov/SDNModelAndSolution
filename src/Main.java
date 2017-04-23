@@ -8,8 +8,8 @@ public class Main {
     static double alpha = 3;
     static double beta = 2;
     static double q = 0.5; // Вероятность ухода пакета из системы
-    static int i1Len = 3; //состояние - длина первой очереди + количество в обработке на коммутаторе. 1 - один на обработке. 2 - 1 в очереди, один в обработке
-    static int i2Len = 3; //состояние - длина второй очереди + количество в обработке на контроллере. 1 - один на обработке. 2 - 1 в очереди, один в обработке
+    static int i1Len = 2; //состояние - длина первой очереди + количество в обработке на коммутаторе. 1 - один на обработке. 2 - 1 в очереди, один в обработке
+    static int i2Len = 2; //состояние - длина второй очереди + количество в обработке на контроллере. 1 - один на обработке. 2 - 1 в очереди, один в обработке
     static double epsilon = 0.0001; //необходимая точность
     static int size = (i1Len+1) * (i2Len+1); //вычисляем размерность матрицы
     static Drop drop = new Drop(i1Len, i2Len);
@@ -126,7 +126,7 @@ public class Main {
                 } else if (i1state == i1 && i2state == i2 + 1) { //Прошла обработка на контроллере и пакет попал на коммутатор, но был сброшен
                     matrix[index(i1, i2)][index(i1state, i2state)] = beta*drop.p1(i1);
                 } else if (i1state == i1 - 1 && i2state == i2 + 1) { //Прошла обработка на контроллере и пакет попал на коммутатор
-                    matrix[index(i1, i2)][index(i1state, i2state)] = beta*drop.p1(i1);
+                    matrix[index(i1, i2)][index(i1state, i2state)] = beta*(1 - drop.p1(i1));
                 } else if (i1state == i1 + 1 && i2state == i2 - 1) { //Прошла обработка на коммутаторе и пакет ушел на контроллер
                     matrix[index(i1, i2)][index(i1state, i2state)] = alpha*(1-q)*(1-drop.p2(i2));
                 } else {
