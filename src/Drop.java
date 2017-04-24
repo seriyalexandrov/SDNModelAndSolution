@@ -24,4 +24,15 @@ public class Drop {
         if (i2 >= i2Max-1) return 1;
         return (i2 - i2Treshold)/(i2Max - 1 - i2Treshold);
     }
+
+    public double percent(double[] probabilities) {
+
+        double sum = 0;
+        for (int i1 = 0; i1 <= i1Max; i1++) {
+            for (int i2 = 0; i2 <= i2Max; i2++) {
+                sum += probabilities[i1*(i2Max+1)+i2]*(p1(i1) + p2(i2));
+            }
+        }
+        return sum;
+    }
 }
