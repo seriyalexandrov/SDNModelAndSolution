@@ -14,15 +14,22 @@ public class Drop {
     }
 
     public double p1(int i1) {
-        if (i1 < i1Treshold) return 0;
-        if (i1 >= i1Max-1) return 1;
-        return (i1 - i1Treshold)/(i1Max - 1 - i1Treshold);
+        double p;
+        if (i1 < i1Treshold) {
+            p = 0;
+        } else if (i1 >= i1Max) {
+            p = 1;
+        } else {
+            p = (i1 - i1Treshold)*1.0/ (i1Max - i1Treshold);
+        }
+//        System.out.printf("p= %f, treshold= %d, iMax= %d, i= %d\n", p, i1Treshold, i1Max, i1);
+        return p;
     }
 
     public double p2(int i2) {
         if (i2 < i2Treshold) return 0;
-        if (i2 >= i2Max-1) return 1;
-        return (i2 - i2Treshold)/(i2Max - 1 - i2Treshold);
+        if (i2 >= i2Max) return 1;
+        return (i2 - i2Treshold)*1.0/(i2Max - i2Treshold);
     }
 
     public double percent(double[] probabilities) {
