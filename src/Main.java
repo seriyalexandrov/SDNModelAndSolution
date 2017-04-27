@@ -2,25 +2,35 @@ public class Main {
 
     private static double[][] matrix;
 
-    static double lambda = 4;
-    static double alpha = 5;
-    static double beta = 2;
+    static double lambda = 500;
+    static double alpha = 900;
+    static double beta = 400;
     static double q = 0.5; // Вероятность ухода пакета из системы
     static int i1Len = 10; //состояние - длина первой очереди + количество в обработке на коммутаторе. 1 - один на обработке. 2 - 1 в очереди, один в обработке
-    static int i2Len = 10; //состояние - длина второй очереди + количество в обработке на контроллере. 1 - один на обработке. 2 - 1 в очереди, один в обработке
-    static double epsilon = 0.00000000001; //необходимая точность
-    static int size = (i1Len + 1) * (i2Len + 1); //вычисляем размерность матрицы
-    static Drop drop = new Drop(i1Len, i2Len);
+    static int i2Len = 40; //состояние - длина второй очереди + количество в обработке на контроллере. 1 - один на обработке. 2 - 1 в очереди, один в обработке
+    static double epsilon = 0.0000000001; //необходимая точность
+    static int size;
+    static Drop drop;
 
     public static void main(String[] args) {
-        createMatrix();
+
+        System.out.println("Length   dropped  dropped1  dropped2  buffer   sojourn");
+        for(i1Len = 10; i1Len <= 100; i1Len+=10) {
+            i2Len = i1Len;
+            size = (i1Len + 1) * (i2Len + 1); //вычисляем размерность матрицы
+            drop = new Drop(i1Len, i2Len);
+            createMatrix();
 //        Utils.printMatrix(matrix, i1Len, i2Len);
-        double[] result = calcGaussZeidel();
-        double dropPercent = drop.percent(result);
-        double bufferLenght = Utils.averageBufferLength(result, i1Len, i2Len);
-        System.out.println("Percent of dropped packages: " + dropPercent);
-        System.out.println("Average buffer length: " + bufferLenght);
-        System.out.println("Average sojourn time: " + Utils.averageSojournTime(bufferLenght, lambda, dropPercent));
+            double[] result = calcGaussZeidel();
+            double dropPercent = drop.percent(result);
+            double drop1Percent = drop.percentD1(result);
+            double drop2Percent = drop.percentD2(result);
+            double bufferLenght = Utils.averageBufferLength(result, i1Len, i2Len);
+            double sojourn = Utils.averageSojournTime(bufferLenght, lambda, dropPercent);
+
+            System.out.printf("   %d    %3.3f    %3.3f     %3.3f     %3.3f    %3.3f\n",
+                    i1Len, dropPercent, drop1Percent, drop2Percent, bufferLenght, sojourn);
+        }
     }
 
     private static void createMatrix() {

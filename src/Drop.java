@@ -42,4 +42,26 @@ public class Drop {
         }
         return sum;
     }
+
+    public double percentD1(double[] probabilities) {
+
+        double sum = 0;
+        for (int i1 = 0; i1 <= i1Max; i1++) {
+            for (int i2 = 0; i2 <= i2Max; i2++) {
+                sum += probabilities[i1*(i2Max+1)+i2]*(p1(i1));
+            }
+        }
+        return sum;
+    }
+
+    public double percentD2(double[] probabilities) {
+
+        double sum = 0;
+        for (int i1 = 0; i1 <= i1Max; i1++) {
+            for (int i2 = 0; i2 <= i2Max; i2++) {
+                sum += probabilities[i1*(i2Max+1)+i2]*(p2(i2));
+            }
+        }
+        return sum;
+    }
 }
