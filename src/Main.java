@@ -1,32 +1,36 @@
+import java.util.Arrays;
+
 public class Main {
 
-    private static double[][] matrix;
+    private static float[][] matrix;
 
-    static double lambda = 500;
-    static double alpha = 900;
-    static double beta = 400;
-    static double q = 0.5; // Вероятность ухода пакета из системы
+    static float lambda = 500;
+    static float alpha = 900;
+    static float beta = 500;
+    static float q = 0.5f; // Вероятность ухода пакета из системы
     static int i1Len = 10; //состояние - длина первой очереди + количество в обработке на коммутаторе. 1 - один на обработке. 2 - 1 в очереди, один в обработке
     static int i2Len = 40; //состояние - длина второй очереди + количество в обработке на контроллере. 1 - один на обработке. 2 - 1 в очереди, один в обработке
-    static double epsilon = 0.0000000001; //необходимая точность
+    static float epsilon = 0.00001f; //необходимая точность
     static int size;
     static Drop drop;
 
     public static void main(String[] args) {
 
         System.out.println("Length   dropped  dropped1  dropped2  buffer   sojourn");
-        for(i1Len = 10; i1Len <= 100; i1Len+=10) {
+        int maxSize = 151*151;
+        matrix = new float[maxSize][maxSize + 1];
+        for(i1Len = 10; i1Len <= 150; i1Len+=10) {
             i2Len = i1Len;
             size = (i1Len + 1) * (i2Len + 1); //вычисляем размерность матрицы
             drop = new Drop(i1Len, i2Len);
             createMatrix();
 //        Utils.printMatrix(matrix, i1Len, i2Len);
-            double[] result = calcGaussZeidel();
-            double dropPercent = drop.percent(result);
-            double drop1Percent = drop.percentD1(result);
-            double drop2Percent = drop.percentD2(result);
-            double bufferLenght = Utils.averageBufferLength(result, i1Len, i2Len);
-            double sojourn = Utils.averageSojournTime(bufferLenght, lambda, dropPercent);
+            float[] result = calcGaussZeidel();
+            float dropPercent = drop.percent(result);
+            float drop1Percent = drop.percentD1(result);
+            float drop2Percent = drop.percentD2(result);
+            float bufferLenght = Utils.averageBufferLength(result, i1Len, i2Len);
+            float sojourn = Utils.averageSojournTime(bufferLenght, lambda, dropPercent);
 
             System.out.printf("   %d    %3.3f    %3.3f     %3.3f     %3.3f    %3.3f\n",
                     i1Len, dropPercent, drop1Percent, drop2Percent, bufferLenght, sojourn);
@@ -34,7 +38,6 @@ public class Main {
     }
 
     private static void createMatrix() {
-        matrix = new double[size][size + 1];
         for (int i1 = 0; i1 <= i1Len; i1++) {
             for (int i2 = 0; i2 <= i2Len; i2++) {
                 fillRightPartCoefficientsForState(i1, i2);
@@ -58,7 +61,7 @@ public class Main {
                         (i1state == i1 - 1 && i2state == i2 - 1) || // Или два события одновременно, что невозможно
                         (i1state == i1 + 1 && i2state == i2 + 1) ||
                         (i1state == i1 && i2state == i2 - 1)) { //Пришел новый пакет во вторую очередь, причем в первой не поубавилось - невозможно
-                    matrix[index(i1, i2)][index(i1state, i2state)] = 0.0;
+                    matrix[index(i1, i2)][index(i1state, i2state)] = 0.0f;
                 } else if (i1state == i1 && i2state == i2) {
                     matrix[index(i1, i2)][index(i1state, i2state)] = -(lambda * (1 - drop.p1(i1)) + alpha * I.i1(i1) + beta * I.i2(i2));
                 } else if (i1state == i1 - 1 && i2state == i2) { // Поступил внешний пакет, причем он не был отброшен
@@ -83,23 +86,20 @@ public class Main {
         return i1 * (i2Len + 1) + i2;
     }
 
-    private static double[] calcGaussZeidel() {
+    private static float[] calcGaussZeidel() {
 
         // Введем вектор значений неизвестных на предыдущей итерации,
         // размер которого равен числу строк в матрице, т.е. size,
         // причем согласно методу изначально заполняем его нулями
-        double[] previousVariableValues = new double[size];
-        for (int i = 0; i < size; i++) {
-            previousVariableValues[i] = 1.0;
-        }
+        float[] previousVariableValues = new float[size];
+        Arrays.fill(previousVariableValues, 1f);
+
+        // Введем вектор значений неизвестных на текущем шаге
+        float[] currentVariableValues = new float[size];
 
         // Будем выполнять итерационный процесс до тех пор,
         // пока не будет достигнута необходимая точность
         while (true) {
-            Utils.checkCycle();
-            // Введем вектор значений неизвестных на текущем шаге
-            double[] currentVariableValues = new double[size];
-
             // Посчитаем значения неизвестных на текущей итерации
             // в соответствии с теоретическими формулами
             for (int i = 0; i < size; i++) {
@@ -126,7 +126,7 @@ public class Main {
             }
 
             // Посчитаем текущую погрешность относительно предыдущей итерации
-            double error = 0.0;
+            float error = 0.0f;
 
             for (int i = 0; i < size; i++) {
                 error += Math.abs(currentVariableValues[i] - previousVariableValues[i]);
@@ -140,11 +140,12 @@ public class Main {
             // Переходим к следующей итерации, так
             // что текущие значения неизвестных
             // становятся значениями на предыдущей итерации
-            previousVariableValues = currentVariableValues;
+
+            System.arraycopy(currentVariableValues, 0, previousVariableValues, 0, currentVariableValues.length);
         }
 
-        double normalize = 0;
-        for(double e : previousVariableValues) {
+        float normalize = 0;
+        for(float e : previousVariableValues) {
             normalize += e;
         }
 
@@ -158,13 +159,13 @@ public class Main {
 
     private static void gauss() {
 
-        double[] results = new double[size];
+        float[] results = new float[size];
         for (int i = 0; i < size - 1; i++) {
-            double diviver = matrix[i][i];
+            float diviver = matrix[i][i];
 
             for (int j = i + 1; j < size; j++) {
-                double multiplyier = matrix[j][i];
-                double coefficient = multiplyier / diviver;
+                float multiplyier = matrix[j][i];
+                float coefficient = multiplyier / diviver;
                 for (int k = i + 1; k < size + 1; k++) {
                     matrix[j][k] -= matrix[i][k] * coefficient;
 

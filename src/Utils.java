@@ -1,6 +1,6 @@
 public class Utils {
 
-    public static void printMatrix(double[][] m, int i1Len, int i2Len) {
+    public static void printMatrix(float[][] m, int i1Len, int i2Len) {
 
         int size = (i1Len+1) * (i2Len+1);
         System.out.print("        ");
@@ -24,19 +24,19 @@ public class Utils {
     private static int interationCounter = 0;
 
     public static void checkCycle() {
-        if (interationCounter++ > 1000000000) throw new IllegalStateException("Infinite cycle!");
+//        if (interationCounter++ > 1000000000) throw new IllegalStateException("Infinite cycle!");
     }
 
-    public static void printResult(double[] res) {
-        for (double e : res) {
+    public static void printResult(float[] res) {
+        for (float e : res) {
             System.out.printf("%3.8f ", e);
         }
         System.out.println();
     }
 
-    public static void validateResult(double[] res) {
-        double s = 0;
-        for (double e : res) {
+    public static void validateResult(float[] res) {
+        float s = 0;
+        for (float e : res) {
             s += e;
         }
         if (Math.abs(s - 1) > 0.001) throw new IllegalStateException("Result is not consistent: " + s);
@@ -48,9 +48,9 @@ public class Utils {
         System.out.println("pDrop2 = " + drop.p2(i2));
     }
 
-    public static void checkMatrixColoumnSumIsZero(double[][] matrix, int size) {
+    public static void checkMatrixColoumnSumIsZero(float[][] matrix, int size) {
         for (int col = 0; col < size; col++) {
-            double sum = 0;
+            float sum = 0;
             for (int row = 0; row < size; row++) {
                 sum += matrix[row][col];
             }
@@ -60,8 +60,8 @@ public class Utils {
         }
     }
 
-    public static double averageBufferLength(double[] probabilities, int i1Max, int i2Max) {
-        double sum = 0;
+    public static float averageBufferLength(float[] probabilities, int i1Max, int i2Max) {
+        float sum = 0;
         for (int i1 = 0; i1 <= i1Max; i1++) {
             for (int i2 = 0; i2 <= i2Max; i2++) {
                 sum += probabilities[i1*(i2Max+1)+i2]*(i1 + i2);
@@ -70,7 +70,7 @@ public class Utils {
         return sum;
     }
 
-    public static double averageSojournTime(double m, double lambda, double pi) {
+    public static float averageSojournTime(float m, float lambda, float pi) {
         return m/(lambda*(1-pi));
     }
 }
