@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.Locale;
 
 public class Main {
 
@@ -6,7 +7,7 @@ public class Main {
 
     static float lambda = 500;
     static float alpha = 900;
-    static float beta = 500;
+    static float beta = 450;
     static float q = 0.5f; // Вероятность ухода пакета из системы
     static int i1Len = 10; //состояние - длина первой очереди + количество в обработке на коммутаторе. 1 - один на обработке. 2 - 1 в очереди, один в обработке
     static int i2Len = 40; //состояние - длина второй очереди + количество в обработке на контроллере. 1 - один на обработке. 2 - 1 в очереди, один в обработке
@@ -16,7 +17,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        System.out.println("Length   dropped  dropped1  dropped2  buffer   sojourn");
+        System.out.println("Length   dropped  dropped1  dropped2  buffer    buff1    buff2    sojourn");
         int maxSize = 151*151;
         matrix = new float[maxSize][maxSize + 1];
         for(i1Len = 10; i1Len <= 150; i1Len+=10) {
@@ -29,11 +30,13 @@ public class Main {
             float dropPercent = drop.percent(result);
             float drop1Percent = drop.percentD1(result);
             float drop2Percent = drop.percentD2(result);
-            float bufferLenght = Utils.averageBufferLength(result, i1Len, i2Len);
-            float sojourn = Utils.averageSojournTime(bufferLenght, lambda, dropPercent);
+            float bufferLength = Utils.averageBufferLength(result, i1Len, i2Len);
+            float buffer1Length = Utils.averageBuffer1Length(result, i1Len, i2Len);
+            float buffer2Length = Utils.averageBuffer2Length(result, i1Len, i2Len);
+            float sojourn = Utils.averageSojournTime(bufferLength, lambda, dropPercent);
 
-            System.out.printf("   %d    %3.3f    %3.3f     %3.3f     %3.3f    %3.3f\n",
-                    i1Len, dropPercent, drop1Percent, drop2Percent, bufferLenght, sojourn);
+            System.out.printf(Locale.ROOT, "   %d    %3.3f    %3.3f     %3.3f     %3.3f     %3.3f    %3.3f    %3.3f\n",
+                    i1Len, dropPercent, drop1Percent, drop2Percent, bufferLength, buffer1Length, buffer2Length, sojourn);
         }
     }
 

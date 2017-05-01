@@ -70,6 +70,26 @@ public class Utils {
         return sum;
     }
 
+    public static float averageBuffer1Length(float[] probabilities, int i1Max, int i2Max) {
+        float sum = 0;
+        for (int i1 = 0; i1 <= i1Max; i1++) {
+            for (int i2 = 0; i2 <= i2Max; i2++) {
+                sum += probabilities[i1*(i2Max+1)+i2]*(i1);
+            }
+        }
+        return sum;
+    }
+
+    public static float averageBuffer2Length(float[] probabilities, int i1Max, int i2Max) {
+        float sum = 0;
+        for (int i1 = 0; i1 <= i1Max; i1++) {
+            for (int i2 = 0; i2 <= i2Max; i2++) {
+                sum += probabilities[i1*(i2Max+1)+i2]*(i2);
+            }
+        }
+        return sum;
+    }
+
     public static float averageSojournTime(float m, float lambda, float pi) {
         return m/(lambda*(1-pi));
     }
