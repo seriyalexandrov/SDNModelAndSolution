@@ -22,7 +22,7 @@ public class Drop {
         } else {
             p = (i1 - i1Treshold)*1.0f/ (i1Max - i1Treshold);
         }
-//        System.out.printf("p= %f, treshold= %d, iMax= %d, i= %d\n", p, i1Treshold, i1Max, i1);
+//        System.out.printf("p= %f, treshold= %d, iMax= %d, i= %d\n", p, i1Treshold, i1Max, i);
         return p;
     }
 

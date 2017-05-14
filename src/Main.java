@@ -5,8 +5,8 @@ public class Main {
     private static float[][] matrix;
 
     static float lambda = 500;
-    static float[] alphas = new float[]{450, 500};
-    static float[] betas = new float[]{450, 500};
+    static float[] alphas = new float[]{500, 500};
+    static float[] betas = new float[]{450, 450};
     static float q = 0.5f; // Вероятность ухода пакета из системы
     static int i1Len = 1; //состояние - длина первой очереди + количество в обработке на коммутаторе. 1 - один на обработке. 2 - 1 в очереди, один в обработке
     static int i2Len = 1; //состояние - длина второй очереди + количество в обработке на контроллере. 1 - один на обработке. 2 - 1 в очереди, один в обработке
@@ -47,13 +47,13 @@ public class Main {
             for (int i2 = 0; i2 <= i2Len; i2++) {
                 for (int alpha = 0; alpha <= alphaLen; alpha++) {
                     for (int beta = 0; beta <= betaLen; beta++) {
-//                        fillRightPartCoefficientsForState(i1, i2, alpha, beta);
+                        fillRightPartCoefficientsForState(i1, i2, alpha, beta);
                         fillLeftPartCoefficientForState(i1, i2, alpha, beta);
                     }
                 }
             }
         }
-        Utils.checkMatrixColoumnSumIsZero(matrix, size);
+//        Utils.checkMatrixColoumnSumIsZero(matrix, size); TODO
     }
 
     private static void fillLeftPartCoefficientForState(int i1, int i2, int alpha, int beta) {
@@ -67,28 +67,26 @@ public class Main {
                 for (int alphaState = 0; alphaState <= alphaLen; alphaState++) {
                     for (int betaState = 0; betaState <= betaLen; betaState++) {
 
-//                        if (Math.abs(i1 - i1state) > 1 || //Or difference between states is more than 1.
-//                                Math.abs(i2 - i2state) > 1 ||
-//                                (i1state == i1 - 1 && i2state == i2 - 1) || // Или два события одновременно, что невозможно
-//                                (i1state == i1 + 1 && i2state == i2 + 1) ||
-//                                (i1state == i1 && i2state == i2 - 1)) { //Пришел новый пакет во вторую очередь, причем в первой не поубавилось - невозможно
-//                            matrix[i(i1, i2, alpha, beta)][i(i1state, i2state)] = 0.0f;
-//                        } else if (i1state == i1 && i2state == i2) {
-//                            matrix[i(i1, i2)][i(i1state, i2state)] = -(lambda * (1 - drop.p1(i1)) + alpha * I.i1(i1) + beta * I.i2(i2));
-//                        } else if (i1state == i1 - 1 && i2state == i2) { // Поступил внешний пакет, причем он не был отброшен
-//                            matrix[i(i1, i2)][i(i1state, i2state)] = lambda * (1 - drop.p1(i1state));
-//                        } else if (i1state == i1 + 1 && i2state == i2) { // Прошла обработка на коммутаторе и пакет ушел из системы либо не ушел из системы, но был сброшен на второй очереди
-//                            matrix[i(i1, i2)][i(i1state, i2state)] = alpha * q + alpha * (1 - q) * drop.p2(i2state);
-//                        } else if (i1state == i1 && i2state == i2 + 1) { //Прошла обработка на контроллере и пакет попал на коммутатор, но был сброшен
-//                            matrix[i(i1, i2)][i(i1state, i2state)] = beta * drop.p1(i1state);
-//                        } else if (i1state == i1 - 1 && i2state == i2 + 1) { //Прошла обработка на контроллере и пакет попал на коммутатор
-//                            matrix[i(i1, i2)][i(i1state, i2state)] = beta * (1 - drop.p1(i1state));
-//                        } else if (i1state == i1 + 1 && i2state == i2 - 1) { //Прошла обработка на коммутаторе и пакет ушел на контроллер
-//                            matrix[i(i1, i2)][i(i1state, i2state)] = alpha * (1 - q) * (1 - drop.p2(i2state));
-//                        } else {
-//                            Utils.printState(i1, i2, i1state, i2state, drop);
-//                            throw new IllegalStateException("Unknown state");
-//                        }
+                        if ((i1state > 0 && alphaState == 0) || (i2state > 0 && betaState == 0)) { //исключаем невозможные состояния
+                            matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] = 0;
+                        } else if (i1state == i1 && i2state == i2 && alphaState == alpha && betaState == beta) {
+                            float k = lambda * (1 - drop.p1(i1));
+                            k += I.i(alpha)*alphas[I.i(alpha)*(alpha-1)];
+                            k += I.i(beta)*betas[I.i(beta)*(beta-1)];
+                            matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] = -k;
+//                        } else if (i1state == i - 1 && i2state == i) { // Поступил внешний пакет, причем он не был отброшен
+//                            matrix[Utils.i(i, i)][Utils.i(i1state, i2state)] = lambda * (1 - drop.p1(i1state));
+//                        } else if (i1state == i + 1 && i2state == i) { // Прошла обработка на коммутаторе и пакет ушел из системы либо не ушел из системы, но был сброшен на второй очереди
+//                            matrix[Utils.i(i, i)][Utils.i(i1state, i2state)] = alpha * q + alpha * (1 - q) * drop.p2(i2state);
+//                        } else if (i1state == i && i2state == i + 1) { //Прошла обработка на контроллере и пакет попал на коммутатор, но был сброшен
+//                            matrix[Utils.i(i, i)][Utils.i(i1state, i2state)] = beta * drop.p1(i1state);
+//                        } else if (i1state == i - 1 && i2state == i + 1) { //Прошла обработка на контроллере и пакет попал на коммутатор
+//                            matrix[Utils.i(i, i)][Utils.i(i1state, i2state)] = beta * (1 - drop.p1(i1state));
+//                        } else if (i1state == i + 1 && i2state == i - 1) { //Прошла обработка на коммутаторе и пакет ушел на контроллер
+//                            matrix[Utils.i(i, i)][Utils.i(i1state, i2state)] = alpha * (1 - q) * (1 - drop.p2(i2state));
+                        } else {
+                            matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] = 0.0f;
+                        }
                     }
                 }
             }
