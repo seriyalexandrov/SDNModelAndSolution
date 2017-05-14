@@ -23,7 +23,7 @@ public class Main {
         matrix = new float[maxSize][maxSize + 1];
 //        for(i1Len = 10; i1Len <= 150; i1Len+=10) {
         i2Len = i1Len;
-        size = (i1Len + 1) * (i2Len + 1); //вычисляем размерность матрицы
+        size = (i1Len + 1) * (i2Len + 1) * (alphaLen + 1) * (betaLen + 1); //вычисляем размерность матрицы
         drop = new Drop(i1Len, i2Len);
         createMatrix();
         Utils.printMatrix(matrix, i1Len, i2Len, alphaLen, betaLen);
@@ -58,7 +58,7 @@ public class Main {
 
     private static void fillLeftPartCoefficientForState(int i1, int i2, int alpha, int beta) {
         //Заполняем значение в столбце левой части
-        matrix[Utils.i(i1, i2, alpha, beta)][size] = 1;
+        matrix[Utils.i(i1, i2, alpha, beta)][size] = 0;
     }
 
     private static void fillRightPartCoefficientsForState(int i1, int i2, int alpha, int beta) {
