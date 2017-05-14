@@ -1,22 +1,30 @@
 public class Utils {
 
-    public static void printMatrix(float[][] m, int i1Len, int i2Len) {
+    public static void printMatrix(float[][] m, int i1Len, int i2Len, int alphaLen, int betaLen) {
 
-        int size = (i1Len+1) * (i2Len+1);
+        int size = (i1Len+1) * (i2Len+1) * (alphaLen+1) * (betaLen+1);
         System.out.print("        ");
         for(int i1 = 0; i1 <= i1Len; i1++) {
             for(int i2 = 0; i2 <= i2Len; i2++) {
-                System.out.print("(" + i1 + ", " + i2 + ") ");
+                for(int alpha = 0; alpha <= alphaLen; alpha++) {
+                    for(int beta = 0; beta <= betaLen; beta++) {
+                        System.out.print(" (" + i1 + "," + i2 + "," + alpha + "," + beta + ")");
+                    }
+                }
             }
         }
         System.out.println();
         for(int i1 = 0; i1 <= i1Len; i1++) {
             for(int i2 = 0; i2 <= i2Len; i2++) {
-                System.out.print("(" + i1 + ", " + i2 + ")   ");
-                for (int col = 0; col < size+1; col++) {
-                    System.out.printf("%3.2f   ", m[i1*(i2Len+1)+i2][col]);
+                for(int alpha = 0; alpha <= alphaLen; alpha++) {
+                    for (int beta = 0; beta <= betaLen; beta++) {
+                        System.out.print("(" + i1 + "," + i2 + "," + alpha + "," + beta + ")   ");
+                        for (int col = 0; col < size + 1; col++) {
+                            System.out.printf("%5.2f     ", m[i(i1, i2, alpha, beta)][col]);
+                        }
+                        System.out.println();
+                    }
                 }
-                System.out.println();
             }
         }
     }
@@ -24,7 +32,7 @@ public class Utils {
     private static int interationCounter = 0;
 
     public static void checkCycle() {
-//        if (interationCounter++ > 1000000000) throw new IllegalStateException("Infinite cycle!");
+        if (interationCounter++ > 100000) throw new IllegalStateException("Infinite cycle!");
     }
 
     public static void printResult(float[] res) {
@@ -92,5 +100,13 @@ public class Utils {
 
     public static float averageSojournTime(float m, float lambda, float pi) {
         return m/(lambda*(1-pi));
+    }
+
+    static int i(int i1, int i2, int alpha, int beta) {
+        return
+                i1 * (Main.i2Len + 1)*(Main.alphaLen + 1)*(Main.betaLen + 1) +
+                i2*(Main.alphaLen + 1)*(Main.betaLen + 1) +
+                alpha*(Main.betaLen + 1) +
+                beta;
     }
 }
