@@ -3,7 +3,7 @@ public class Utils {
     public static void printMatrix(float[][] m, int i1Len, int i2Len, int alphaLen, int betaLen) {
 
         int size = (i1Len+1) * (i2Len+1) * (alphaLen+1) * (betaLen+1);
-        System.out.print("        ");
+        System.out.print("          ");
         for(int i1 = 0; i1 <= i1Len; i1++) {
             for(int i2 = 0; i2 <= i2Len; i2++) {
                 for(int alpha = 0; alpha <= alphaLen; alpha++) {
