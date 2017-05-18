@@ -76,32 +76,40 @@ public class Main {
                             k += I.i(alpha) * alphas[I.i(alpha) * (alpha - 1)];
                             k += I.i(beta) * betas[I.i(beta) * (beta - 1)];
                             matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] = -k;
-                        } else if (i1state == 0 && i1 == 0 && i2state == i2 && alphaState == 0 && alpha == 1 && betaState == beta) {
+                        } else if (i1state == 0 && i1 == 1 && i2state == i2 && alphaState == 0 && alpha == 1 && betaState == beta) {
                             //Поступил внешний пакет и сразу попал на обработку, т.к. очередь пуста
                             matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] = lambda * (1 - drop.p1(i1state));
-                        } else if (i1state == 0 && i1 == 1 && i2state == i2 && alphaState == 0 && alpha == 0 && betaState == beta) {
+                        } else if ( (i1state==0 && i1==1 && i2state==i2 && alphaState==0 && alpha==0 && betaState==beta) ||
+                                    (i1state==i1 && i2state==0 && i2==1 && alphaState==alpha && betaState==0 && beta==0)) {
                             //невозможное состояние
                             matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] = 0;
                         } else if (i1state == i1 - 1 && i2state == i2 && alphaState == alpha && betaState == beta) { // Поступил внешний пакет, причем он не был отброшен, причем есть пакет в обработке
                             matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] = lambda * (1 - drop.p1(i1state));
                         } else if (i1state == i1 + 1 && i2state == i2 && alpha == 1 && alphaState > 0 && betaState == beta) { // Прошла обработка на коммутаторе и пакет ушел из системы либо не ушел из системы, но был сброшен на второй очереди
                             matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] =
-                                    alphas[alphaState - 1] * alphaP[alphaState - 1] * q +
-                                            alphas[alphaState - 1] * alphaP[alphaState - 1] * (1 - q) * drop.p2(i2state);
-                        } else if (i1state == i1 && i2state == i2 && alphaState == alpha-1 && betaState == beta) { // Прошла обработка на коммутаторе и переход на следующую стадию
+                                    alphas[alphaState - 1] * (1-alphaP[alphaState - 1]) * q +
+                                            alphas[alphaState - 1] * (1-alphaP[alphaState - 1]) * (1 - q) * drop.p2(i2state);
+                        } else if (i1state == i1 && i1>0 && i2state == i2 && alphaState == alpha-1 && betaState == beta) { // Прошла обработка на коммутаторе и переход на следующую стадию
                             matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] =
                                     alphas[alphaState - 1] * alphaP[alphaState - 1];
                         } else if (i1state == i1 + 1 && i2state == i2 - 1 && alpha == 1 && alphaState > 0 && betaState == beta) { //Прошла обработка на коммутаторе и пакет ушел на контроллер
                             matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] =
-                                    alphas[alphaState - 1] * alphaP[alphaState - 1] * (1 - q) * (1 - drop.p2(i2state));
-                        } else if (i1state==i1+1 && i2state==0 && i2==0 && alpha == 1 && alphaState > 0 && betaState==0 && beta==1) { //Прошла обработка на коммутаторе и пакет ушел на контроллер
+                                    alphas[alphaState - 1] * (1-alphaP[alphaState - 1]) * (1 - q) * (1 - drop.p2(i2state));
+                        } else if (i1state==i1+1 && i2state==0 && i2==1 && alpha == 1 && alphaState > 0 && betaState==0 && beta==1) { //Прошла обработка на коммутаторе и пакет ушел на контроллер
                             matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] =              //и сразу же ушел в обработку
-                                    alphas[alphaState - 1] * alphaP[alphaState - 1] * (1 - q) * (1 - drop.p2(i2state));
-                        } else if (i1state == i && i2state == i + 1) { //Прошла обработка на контроллере и пакет попал на коммутатор, но был сброшен
-                            matrix[Utils.i(i, i)][Utils.i(i1state, i2state)] = beta * drop.p1(i1state);
-//                        } else if (i1state == i - 1 && i2state == i + 1) { //Прошла обработка на контроллере и пакет попал на коммутатор
-//                            matrix[Utils.i(i, i)][Utils.i(i1state, i2state)] = beta * (1 - drop.p1(i1state));
-//                        }
+                                    alphas[alphaState - 1] * (1-alphaP[alphaState - 1]) * (1 - q) * (1 - drop.p2(i2state));
+                        } else if (i1state == i1 && i2state == i2 + 1 && i2>0 && alphaState == alpha && beta == 1 && betaState > 0) { //Прошла обработка на контроллере и пакет попал на коммутатор, но был сброшен
+                            matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] =
+                                    betas[betaState-1]*(1-betaP[betaState-1]) * drop.p1(i1state);
+                        } else if (i1state == i1-1 && i1state>0 && i2state == i2+1 && i2>0 && alphaState==alpha && beta==1 && betaState>0) { //Прошла обработка на контроллере и пакет попал на коммутатор
+                            matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] =
+                                    betas[betaState - 1] * (1-betaP[betaState - 1]) * (1 - drop.p1(i1state));
+                        } else if (i1state==0 && i1==1 && i2state==i2+1 && i2>0 && alphaState==0 && alpha==1 && betaState>0 && beta==1) { //Прошла обработка на контроллере и пакет попал на коммутатор сразу на обработку
+                            matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] =
+                                    betas[betaState - 1] * (1-betaP[betaState - 1]) * (1 - drop.p1(i1state));
+                        } else if (i1state==i1 && i2state==i2 && i2 > 0 && alphaState==alpha && betaState==beta-1) {//переход на новый этап на контроллере
+                            matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] =
+                                    betas[betaState-1]*betaP[betaState-1];
                         } else {
                             matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] = 0.0f;
                         }
