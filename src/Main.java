@@ -29,8 +29,8 @@ public class Main {
         drop = new Drop(i1Len, i2Len);
         createMatrix();
         Utils.printMatrix(matrix, i1Len, i2Len, alphaLen, betaLen);
-//        float[] result = calcGaussZeidel();
-//        System.out.println("result: " + result);
+        float[] result = calcGaussZeidel();
+        System.out.println("result: " + result);
 //            float dropPercent = drop.percent(result);
 //            float drop1Percent = drop.percentD1(result);
 //            float drop2Percent = drop.percentD2(result);
@@ -56,6 +56,11 @@ public class Main {
             }
         }
         Utils.checkMatrixColoumnSumIsZero(matrix, size);
+        transformSystem();
+    }
+
+    private static void transformSystem() {
+        
     }
 
     private static void fillLeftPartCoefficientForState(int i1, int i2, int alpha, int beta) {
@@ -142,6 +147,7 @@ public class Main {
         // Будем выполнять итерационный процесс до тех пор,
         // пока не будет достигнута необходимая точность
         while (true) {
+            Utils.checkCycle();
             // Посчитаем значения неизвестных на текущей итерации
             // в соответствии с теоретическими формулами
             for (int i = 0; i < size; i++) {
@@ -167,22 +173,14 @@ public class Main {
                 currentVariableValues[i] /= matrix[i][i];
             }
 
-            // Посчитаем текущую погрешность относительно предыдущей итерации
             float error = 0.0f;
-
             for (int i = 0; i < size; i++) {
                 error += Math.abs(currentVariableValues[i] - previousVariableValues[i]);
             }
-
-            // Если необходимая точность достигнута, то завершаем процесс
             if (error < epsilon) {
                 break;
             }
-
-            // Переходим к следующей итерации, так
-            // что текущие значения неизвестных
-            // становятся значениями на предыдущей итерации
-
+            Utils.printResult(previousVariableValues);
             System.arraycopy(currentVariableValues, 0, previousVariableValues, 0, currentVariableValues.length);
         }
 
