@@ -9,8 +9,8 @@ public class Drop {
         this.i1Max = i1Max;
         this.i2Max = i2Max;
 
-        i1Treshold = Math.round(0.7f * (i1Max-1));
-        i2Treshold = Math.round(0.7f * (i2Max-1));
+        i1Treshold = Math.round(0.7f * (i1Max));
+        i2Treshold = Math.round(0.7f * (i2Max));
     }
 
     public float p1(int i1) {
