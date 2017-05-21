@@ -248,6 +248,25 @@ public class Main {
         }
 
         Utils.validateResult(previousVariableValues);
-        return previousVariableValues;
+
+        return trasformToFullResult(previousVariableValues);
+    }
+
+    private static float[] trasformToFullResult(float[] previousVariableValues) {
+        int localSize = (i1Len + 1) * (i2Len + 1) * (alphaLen + 1) * (betaLen + 1);
+        float[] result = new float[localSize];
+        List<Integer> nullables = nullableRows.stream().collect(Collectors.toList());
+        int nullablesCount = 0;
+        int nonnullCount = 0;
+        for (int x = 0; x<localSize; x++) {
+            if (nullablesCount < nullables.size() && nullables.get(nullablesCount) == x) {
+                result[x] = 0;
+                nullablesCount++;
+            } else {
+                result[x] = previousVariableValues[nonnullCount];
+                nonnullCount++;
+            }
+        }
+        return result;
     }
 }
