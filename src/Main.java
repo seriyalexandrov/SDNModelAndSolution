@@ -1,4 +1,5 @@
-import java.util.Arrays;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Main {
 
@@ -17,6 +18,8 @@ public class Main {
     static float epsilon = 0.00001f; //необходимая точность
     static int size;
     static Drop drop;
+    static HashSet<Integer> nullableCols = new HashSet<>();
+    static HashSet<Integer> nullableRows = new HashSet<>();
 
     public static void main(String[] args) {
 
@@ -28,9 +31,10 @@ public class Main {
         size = (i1Len + 1) * (i2Len + 1) * (alphaLen + 1) * (betaLen + 1); //вычисляем размерность матрицы
         drop = new Drop(i1Len, i2Len);
         createMatrix();
-        Utils.printMatrix(matrix, i1Len, i2Len, alphaLen, betaLen);
-        float[] result = calcGaussZeidel();
-        System.out.println("result: " + result);
+//        Utils.printMatrix(matrix, i1Len, i2Len, alphaLen, betaLen);
+        Utils.printMatrixSimple(matrix, size);
+//        float[] result = calcGaussZeidel();
+//        System.out.println("result: " + result);
 //            float dropPercent = drop.percent(result);
 //            float drop1Percent = drop.percentD1(result);
 //            float drop2Percent = drop.percentD2(result);
@@ -55,12 +59,55 @@ public class Main {
                 }
             }
         }
+        Utils.printMatrix(matrix, i1Len, i2Len, alphaLen, betaLen);
         Utils.checkMatrixColoumnSumIsZero(matrix, size);
         transformSystem();
     }
 
     private static void transformSystem() {
-        
+
+        assert nullableCols.size() == nullableRows.size();
+        List<Integer> rowsList = nullableRows.stream().collect(Collectors.toList());
+        List<Integer> colsList = nullableCols.stream().collect(Collectors.toList());
+
+        float[][] matrixCopy = matrix.clone();
+
+        int rowToRemovePos = 0;
+        int colToRemovePos = 0;
+
+        // re-initialise matrix with dimension i-1 , j-1
+        matrix = new float[size-nullableRows.size()][size-nullableCols.size()];
+
+        //row and column counter for the new matrix
+        int tmpX=-1;
+        int tmpY;
+
+
+        //re-populate new matrix by searching through the original copy of matrix, while skipping useless row and column
+        // works only for 1 row and 1 column in a 2d array but by changing the conditional statement we can make it work for n number of rows or columns in a 2d array.
+        for(int i=0; i<size; i++)
+        {
+            tmpX++;
+            if(rowToRemovePos < rowsList.size() && i==rowsList.get(rowToRemovePos)){
+                tmpX--;
+                rowToRemovePos++;
+            }
+            tmpY=-1;
+            colToRemovePos = 0;
+            for(int j=0; j<size; j++){
+                tmpY++;
+                if(colToRemovePos < colsList.size() && j==colsList.get(colToRemovePos)){
+                    tmpY--;
+                    colToRemovePos++;
+                }
+
+                if(!nullableRows.contains(i) && !nullableCols.contains(j)){
+                    matrix[tmpX][tmpY] = matrixCopy[i][j];
+                }
+            }
+        }
+
+        size = size-nullableRows.size();
     }
 
     private static void fillLeftPartCoefficientForState(int i1, int i2, int alpha, int beta) {
@@ -74,6 +121,12 @@ public class Main {
                 for (int alphaState = 0; alphaState <= alphaLen; alphaState++) {
                     for (int betaState = 0; betaState <= betaLen; betaState++) {
                         //state - старое состояние
+
+                        if ((i1state > 0 && alphaState == 0) || (i2state > 0 && betaState == 0) ||
+                                (i1state == 0 && alphaState > 0) || (i2state == 0 && betaState > 0)) {
+                            nullableRows.add(Utils.i(i1state, i2state, alphaState, betaState));
+                            nullableCols.add(Utils.i(i1state, i2state, alphaState, betaState));
+                        }
                         if ((i1state > 0 && alphaState == 0) || (i2state > 0 && betaState == 0) ||
                                 (i1state == 0 && alphaState > 0) || (i2state == 0 && betaState > 0) ||
                                 (i1 > 0 && alpha == 0) || (i2 > 0 && beta == 0) ||

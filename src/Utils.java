@@ -29,6 +29,18 @@ public class Utils {
         }
     }
 
+    public static void printMatrixSimple(float[][] m, int size) {
+
+        for(int i = 0; i < size; i++) {
+            System.out.println();
+            for (int col = 0; col < size; col++) {
+                System.out.printf("%5.2f     ", m[i][col]);
+            }
+            System.out.println();
+        }
+    }
+
+
     private static int interationCounter = 0;
 
     public static void checkCycle() {
