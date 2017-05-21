@@ -44,7 +44,7 @@ public class Utils {
     private static int interationCounter = 0;
 
     public static void checkCycle() {
-        if (interationCounter++ > 100000) throw new IllegalStateException("Infinite cycle!");
+//        if (interationCounter++ > 100000) throw new IllegalStateException("Infinite cycle!");
     }
 
     public static void printResult(float[] res) {

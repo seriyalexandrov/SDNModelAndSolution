@@ -23,29 +23,29 @@ public class Main {
 
     public static void main(String[] args) {
 
-//        System.out.println("Length   dropped  dropped1  dropped2  buffer    buff1    buff2    sojourn");
-        int maxSize = 16;
+        System.out.println("Length   dropped  dropped1  dropped2  buffer    buff1    buff2    sojourn");
+        int maxSize = 150 * 150;
         matrix = new float[maxSize][maxSize + 1];
-//        for(i1Len = 10; i1Len <= 150; i1Len+=10) {
-        i2Len = i1Len;
-        size = (i1Len + 1) * (i2Len + 1) * (alphaLen + 1) * (betaLen + 1); //вычисляем размерность матрицы
-        drop = new Drop(i1Len, i2Len);
-        createMatrix();
+        for (i1Len = 2; i1Len <= 150; i1Len += 10) {
+            i2Len = 1;//TODO
+            size = (i1Len + 1) * (i2Len + 1) * (alphaLen + 1) * (betaLen + 1); //вычисляем размерность матрицы
+            drop = new Drop(i1Len, i2Len);
+            createMatrix();
 //        Utils.printMatrix(matrix, i1Len, i2Len, alphaLen, betaLen);
-        Utils.printMatrixSimple(matrix, size);
-        float[] result = calcGaussZeidel();
-        Utils.printResult(result);
-//            float dropPercent = drop.percent(result);
-//            float drop1Percent = drop.percentD1(result);
-//            float drop2Percent = drop.percentD2(result);
-//            float bufferLength = Utils.averageBufferLength(result, i1Len, i2Len);
-//            float buffer1Length = Utils.averageBuffer1Length(result, i1Len, i2Len);
-//            float buffer2Length = Utils.averageBuffer2Length(result, i1Len, i2Len);
-//            float sojourn = Utils.averageSojournTime(bufferLength, lambda, dropPercent);
-//
-//            System.out.printf(Locale.ROOT, "   %d    %3.3f    %3.3f     %3.3f     %3.3f     %3.3f    %3.3f    %3.3f\n",
-//                    i1Len, dropPercent, drop1Percent, drop2Percent, bufferLength, buffer1Length, buffer2Length, sojourn);
-//        }
+//            Utils.printMatrixSimple(matrix, size);
+            float[] result = calcGaussZeidel();
+//        Utils.printResult(result);
+            float dropPercent = drop.percent(result);
+            float drop1Percent = drop.percentD1(result);
+            float drop2Percent = drop.percentD2(result);
+            float bufferLength = Utils.averageBufferLength(result, i1Len, i2Len);
+            float buffer1Length = Utils.averageBuffer1Length(result, i1Len, i2Len);
+            float buffer2Length = Utils.averageBuffer2Length(result, i1Len, i2Len);
+            float sojourn = Utils.averageSojournTime(bufferLength, lambda, dropPercent);
+
+            System.out.printf(Locale.ROOT, "   %d    %3.3f    %3.3f     %3.3f     %3.3f     %3.3f    %3.3f    %3.3f\n",
+                    i1Len, dropPercent, drop1Percent, drop2Percent, bufferLength, buffer1Length, buffer2Length, sojourn);
+        }
     }
 
     private static void createMatrix() {
@@ -75,38 +75,37 @@ public class Main {
         int rowToRemovePos = 0;
         int colToRemovePos = 0;
 
-        matrix = new float[size-nullableRows.size()][size-nullableCols.size()+1];
+        matrix = new float[size - nullableRows.size()][size - nullableCols.size() + 1];
 
-        int tmpX=-1;
+        int tmpX = -1;
         int tmpY;
 
 
         //re-populate new matrix by searching through the original copy of matrix, while skipping useless row and column
         // works only for 1 row and 1 column in a 2d array but by changing the conditional statement we can make it work for n number of rows or columns in a 2d array.
-        for(int i=0; i<size; i++)
-        {
+        for (int i = 0; i < size; i++) {
             tmpX++;
-            if(rowToRemovePos < rowsList.size() && i==rowsList.get(rowToRemovePos)){
+            if (rowToRemovePos < rowsList.size() && i == rowsList.get(rowToRemovePos)) {
                 tmpX--;
                 rowToRemovePos++;
             }
-            tmpY=-1;
+            tmpY = -1;
             colToRemovePos = 0;
-            for(int j=0; j<size; j++){
+            for (int j = 0; j < size; j++) {
                 tmpY++;
-                if(colToRemovePos < colsList.size() && j==colsList.get(colToRemovePos)){
+                if (colToRemovePos < colsList.size() && j == colsList.get(colToRemovePos)) {
                     tmpY--;
                     colToRemovePos++;
                 }
 
-                if(!nullableRows.contains(i) && !nullableCols.contains(j)){
+                if (!nullableRows.contains(i) && !nullableCols.contains(j)) {
                     matrix[tmpX][tmpY] = matrixCopy[i][j];
                 }
             }
         }
 
-        size = size-nullableRows.size();
-        for(int x = 0; x < size; x++) {
+        size = size - nullableRows.size();
+        for (int x = 0; x < size; x++) {
             matrix[x][size] = 0;
         }
     }
@@ -131,7 +130,7 @@ public class Main {
                         if ((i1state > 0 && alphaState == 0) || (i2state > 0 && betaState == 0) ||
                                 (i1state == 0 && alphaState > 0) || (i2state == 0 && betaState > 0) ||
                                 (i1 > 0 && alpha == 0) || (i2 > 0 && beta == 0) ||
-                                (i1== 0 && alpha > 0) || (i2 == 0 && beta > 0)) { //исключаем невозможные состояния
+                                (i1 == 0 && alpha > 0) || (i2 == 0 && beta > 0)) { //исключаем невозможные состояния
                             matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] = 0;
                         } else if (i1state == i1 && i2state == i2 && alphaState == alpha && betaState == beta) {
                             float k = lambda * (1 - drop.p1(i1));
@@ -141,43 +140,43 @@ public class Main {
                         } else if (i1state == 0 && i1 == 1 && i2state == i2 && alphaState == 0 && alpha == 1 && betaState == beta) {
                             //Поступил внешний пакет и сразу попал на обработку, т.к. очередь пуста
                             matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] = lambda * (1 - drop.p1(i1state));
-                        } else if ( (i1state==0 && i1==1 && i2state==i2 && alphaState==0 && alpha==0 && betaState==beta) ||
-                                    (i1state==i1 && i2state==0 && i2==1 && alphaState==alpha && betaState==0 && beta==0)) {
+                        } else if ((i1state == 0 && i1 == 1 && i2state == i2 && alphaState == 0 && alpha == 0 && betaState == beta) ||
+                                (i1state == i1 && i2state == 0 && i2 == 1 && alphaState == alpha && betaState == 0 && beta == 0)) {
                             //невозможное состояние
                             matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] = 0;
                         } else if (i1state == i1 - 1 && i2state == i2 && alphaState == alpha && betaState == beta) { // Поступил внешний пакет, причем он не был отброшен, причем есть пакет в обработке
                             matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] = lambda * (1 - drop.p1(i1state));
                         } else if ((i1state == i1 + 1 && i2state == i2 && alpha == 1 && alphaState > 0 && betaState == beta) ||
-                                (i1state>0 && i1==0 && i2state == i2 && alpha == 0 && alphaState > 0 && betaState == beta)) { // Прошла обработка на коммутаторе
+                                (i1state > 0 && i1 == 0 && i2state == i2 && alpha == 0 && alphaState > 0 && betaState == beta)) { // Прошла обработка на коммутаторе
                             matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] =          //и пакет ушел из системы либо не ушел из системы,
-                                    alphas[alphaState - 1] * (1-alphaP[alphaState - 1]) * q +                                 //но был сброшен на второй очереди
-                                            alphas[alphaState - 1] * (1-alphaP[alphaState - 1]) * (1 - q) * drop.p2(i2state);
-                        } else if (i1state == i1 && i1>0 && i2state == i2 && alphaState == alpha-1 && betaState == beta) { // Прошла обработка на коммутаторе и переход на следующую стадию
+                                    alphas[alphaState - 1] * (1 - alphaP[alphaState - 1]) * q +                                 //но был сброшен на второй очереди
+                                            alphas[alphaState - 1] * (1 - alphaP[alphaState - 1]) * (1 - q) * drop.p2(i2state);
+                        } else if (i1state == i1 && i1 > 0 && i2state == i2 && alphaState == alpha - 1 && betaState == beta) { // Прошла обработка на коммутаторе и переход на следующую стадию
                             matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] =
                                     alphas[alphaState - 1] * alphaP[alphaState - 1];
                         } else if ((i1state == i1 + 1 && i2state == i2 - 1 && alpha == 1 && alphaState > 0 && betaState == beta) ||
-                                (i1state>0 && i1==0 && i2state == i2 - 1 && alpha == 0 && alphaState > 0 && betaState == beta)) { //Прошла обработка на коммутаторе и пакет ушел на контроллер
-                            matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] =
-                                    alphas[alphaState - 1] * (1-alphaP[alphaState - 1]) * (1 - q) * (1 - drop.p2(i2state));
-                        } else if ((i1state==i1+1 && i2state==0 && i2==1 && alpha == 1 && alphaState > 0 && betaState==0 && beta==1) ||
-                                (i1state>0 && i1==0 && i2state==0 && i2==1 && alpha == 0 && alphaState > 0 && betaState==0 && beta==1)) { //Прошла обработка на коммутаторе и пакет ушел на контроллер
+                                (i1state > 0 && i1 == 0 && i2state == i2 - 1 && alpha == 0 && alphaState > 0 && betaState == beta)) { //Прошла обработка на коммутаторе и
+                            matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] =                  //пакет ушел на контроллер
+                                    alphas[alphaState - 1] * (1 - alphaP[alphaState - 1]) * (1 - q) * (1 - drop.p2(i2state));
+                        } else if ((i1state == i1 + 1 && i2state == 0 && i2 == 1 && alpha == 1 && alphaState > 0 && betaState == 0 && beta == 1) ||
+                                (i1state > 0 && i1 == 0 && i2state == 0 && i2 == 1 && alpha == 0 && alphaState > 0 && betaState == 0 && beta == 1)) { //Прошла обработка на коммутаторе и пакет ушел на контроллер
                             matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] =              //и сразу же ушел в обработку
-                                    alphas[alphaState - 1] * (1-alphaP[alphaState - 1]) * (1 - q) * (1 - drop.p2(i2state));
-                        } else if ((i1state == i1 && i2state == i2 + 1 && i2>0 && alphaState == alpha && beta == 1 && betaState > 0) ||
-                                (i1state==i1 && i2==0 && i2state>0 && alphaState==alpha && beta==0 && betaState>0)) { //Прошла обработка на контроллере
+                                    alphas[alphaState - 1] * (1 - alphaP[alphaState - 1]) * (1 - q) * (1 - drop.p2(i2state));
+                        } else if ((i1state == i1 && i2state == i2 + 1 && i2 > 0 && alphaState == alpha && beta == 1 && betaState > 0) ||
+                                (i1state == i1 && i2 == 0 && i2state > 0 && alphaState == alpha && beta == 0 && betaState > 0)) { //Прошла обработка на контроллере
                             matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] =   //и пакет попал на коммутатор, но был сброшен
-                                    betas[betaState-1]*(1-betaP[betaState-1]) * drop.p1(i1state);
-                        } else if ((i1state == i1-1 && i1state>0 && i2state == i2+1 && i2>0 && alphaState==alpha && beta==1 && betaState>0) ||
-                                (i1state == i1-1 && i1state>0 && i2state>0 && i2==0 && alphaState==alpha && beta==0 && betaState>0)) { //Прошла обработка на контроллере
+                                    betas[betaState - 1] * (1 - betaP[betaState - 1]) * drop.p1(i1state);
+                        } else if ((i1state == i1 - 1 && i1state > 0 && i2state == i2 + 1 && i2 > 0 && alphaState == alpha && beta == 1 && betaState > 0) ||
+                                (i1state == i1 - 1 && i1state > 0 && i2state > 0 && i2 == 0 && alphaState == alpha && beta == 0 && betaState > 0)) { //Прошла обработка на контроллере
                             matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] =                         //и пакет попал на коммутатор
-                                    betas[betaState - 1] * (1-betaP[betaState - 1]) * (1 - drop.p1(i1state));
-                        } else if ((i1state==0 && i1==1 && i2state==i2+1 && i2>0 && alphaState==0 && alpha==1 && betaState>0 && beta==1) ||
-                                (i1state==0 && i1==1 && i2state>0 && i2==0 && alphaState==0 && alpha==1 && betaState>0 && beta==0)) { //Прошла обработка на контроллере
+                                    betas[betaState - 1] * (1 - betaP[betaState - 1]) * (1 - drop.p1(i1state));
+                        } else if ((i1state == 0 && i1 == 1 && i2state == i2 + 1 && i2 > 0 && alphaState == 0 && alpha == 1 && betaState > 0 && beta == 1) ||
+                                (i1state == 0 && i1 == 1 && i2state > 0 && i2 == 0 && alphaState == 0 && alpha == 1 && betaState > 0 && beta == 0)) { //Прошла обработка на контроллере
                             matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] =                      //и пакет попал на коммутатор сразу на обработку
-                                    betas[betaState - 1] * (1-betaP[betaState - 1]) * (1 - drop.p1(i1state));
-                        } else if (i1state==i1 && i2state==i2 && i2 > 0 && alphaState==alpha && betaState==beta-1) {//переход на новый этап на контроллере
+                                    betas[betaState - 1] * (1 - betaP[betaState - 1]) * (1 - drop.p1(i1state));
+                        } else if (i1state == i1 && i2state == i2 && i2 > 0 && alphaState == alpha && betaState == beta - 1) {//переход на новый этап на контроллере
                             matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] =
-                                    betas[betaState-1]*betaP[betaState-1];
+                                    betas[betaState - 1] * betaP[betaState - 1];
                         } else {
                             matrix[Utils.i(i1, i2, alpha, beta)][Utils.i(i1state, i2state, alphaState, betaState)] = 0.0f;
                         }
@@ -258,7 +257,7 @@ public class Main {
         List<Integer> nullables = nullableRows.stream().collect(Collectors.toList());
         int nullablesCount = 0;
         int nonnullCount = 0;
-        for (int x = 0; x<localSize; x++) {
+        for (int x = 0; x < localSize; x++) {
             if (nullablesCount < nullables.size() && nullables.get(nullablesCount) == x) {
                 result[x] = 0;
                 nullablesCount++;
