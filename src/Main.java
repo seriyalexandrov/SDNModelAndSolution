@@ -33,13 +33,13 @@ public class Main {
 //        Utils.printMatrix(matrix, i1Len, i2Len, alphaLen, betaLen);
 //            Utils.printMatrixSimple(matrix, size);
             float[] result = calcGaussZeidel();
-//        Utils.printResult(result);
+//            Utils.printResult(result);
             float dropPercent = drop.percent(result);
             float drop1Percent = drop.percentD1(result);
             float drop2Percent = drop.percentD2(result);
-            float bufferLength = Utils.averageBufferLength(result, i1Len, i2Len);
-            float buffer1Length = Utils.averageBuffer1Length(result, i1Len, i2Len);
-            float buffer2Length = Utils.averageBuffer2Length(result, i1Len, i2Len);
+            float bufferLength = Utils.averageBufferLength(result, i1Len, i2Len, alphaLen, betaLen);
+            float buffer1Length = Utils.averageBuffer1Length(result, i1Len, i2Len, alphaLen, betaLen);
+            float buffer2Length = Utils.averageBuffer2Length(result, i1Len, i2Len, alphaLen, betaLen);
             float sojourn = Utils.averageSojournTime(bufferLength, lambda, dropPercent);
 
             System.out.printf(Locale.ROOT, "   %d    %3.3f    %3.3f     %3.3f     %3.3f     %3.3f    %3.3f    %3.3f\n",

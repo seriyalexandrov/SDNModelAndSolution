@@ -2,21 +2,21 @@ public class Utils {
 
     public static void printMatrix(float[][] m, int i1Len, int i2Len, int alphaLen, int betaLen) {
 
-        int size = (i1Len+1) * (i2Len+1) * (alphaLen+1) * (betaLen+1);
+        int size = (i1Len + 1) * (i2Len + 1) * (alphaLen + 1) * (betaLen + 1);
         System.out.print("          ");
-        for(int i1 = 0; i1 <= i1Len; i1++) {
-            for(int i2 = 0; i2 <= i2Len; i2++) {
-                for(int alpha = 0; alpha <= alphaLen; alpha++) {
-                    for(int beta = 0; beta <= betaLen; beta++) {
+        for (int i1 = 0; i1 <= i1Len; i1++) {
+            for (int i2 = 0; i2 <= i2Len; i2++) {
+                for (int alpha = 0; alpha <= alphaLen; alpha++) {
+                    for (int beta = 0; beta <= betaLen; beta++) {
                         System.out.print(" (" + i1 + "," + i2 + "," + alpha + "," + beta + ")");
                     }
                 }
             }
         }
         System.out.println();
-        for(int i1 = 0; i1 <= i1Len; i1++) {
-            for(int i2 = 0; i2 <= i2Len; i2++) {
-                for(int alpha = 0; alpha <= alphaLen; alpha++) {
+        for (int i1 = 0; i1 <= i1Len; i1++) {
+            for (int i2 = 0; i2 <= i2Len; i2++) {
+                for (int alpha = 0; alpha <= alphaLen; alpha++) {
                     for (int beta = 0; beta <= betaLen; beta++) {
                         System.out.print("(" + i1 + "," + i2 + "," + alpha + "," + beta + ")   ");
                         for (int col = 0; col < size + 1; col++) {
@@ -31,9 +31,9 @@ public class Utils {
 
     public static void printMatrixSimple(float[][] m, int size) {
 
-        for(int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++) {
             System.out.println();
-            for (int col = 0; col < size+1; col++) {
+            for (int col = 0; col < size + 1; col++) {
                 System.out.printf("%5.2f     ", m[i][col]);
             }
             System.out.println();
@@ -63,7 +63,7 @@ public class Utils {
     }
 
     public static void printState(int i1, int i2, int i1state, int i2state, Drop drop) {
-        System.out.println("from state (" + i1state + ", " + i2state + ") to state (" + i1 + ", " + i2+ ")");
+        System.out.println("from state (" + i1state + ", " + i2state + ") to state (" + i1 + ", " + i2 + ")");
         System.out.println("pDrop1 = " + drop.p1(i1) + " treshold = " + drop.i1Treshold + " maxLen = " + drop.i1Max);
         System.out.println("pDrop2 = " + drop.p2(i2));
     }
@@ -80,45 +80,57 @@ public class Utils {
         }
     }
 
-    public static float averageBufferLength(float[] probabilities, int i1Max, int i2Max) {
+    public static float averageBufferLength(float[] probabilities, int i1Max, int i2Max, int alphaLen, int betaLen) {
         float sum = 0;
         for (int i1 = 0; i1 <= i1Max; i1++) {
             for (int i2 = 0; i2 <= i2Max; i2++) {
-                sum += probabilities[i1*(i2Max+1)+i2]*(i1 + i2);
+                for (int alpha = 0; alpha <= alphaLen; alpha++) {
+                    for (int beta = 0; beta <= betaLen; beta++) {
+                        sum += probabilities[i(i1, i2, alpha, beta)] * (i1 + i2);
+                    }
+                }
             }
         }
         return sum;
     }
 
-    public static float averageBuffer1Length(float[] probabilities, int i1Max, int i2Max) {
+    public static float averageBuffer1Length(float[] probabilities, int i1Max, int i2Max, int alphaLen, int betaLen) {
         float sum = 0;
         for (int i1 = 0; i1 <= i1Max; i1++) {
             for (int i2 = 0; i2 <= i2Max; i2++) {
-                sum += probabilities[i1*(i2Max+1)+i2]*(i1);
+                for (int alpha = 0; alpha <= alphaLen; alpha++) {
+                    for (int beta = 0; beta <= betaLen; beta++) {
+                        sum += probabilities[i(i1, i2, alpha, beta)] * (i1);
+                    }
+                }
             }
         }
         return sum;
     }
 
-    public static float averageBuffer2Length(float[] probabilities, int i1Max, int i2Max) {
+    public static float averageBuffer2Length(float[] probabilities, int i1Max, int i2Max, int alphaLen, int betaLen) {
         float sum = 0;
         for (int i1 = 0; i1 <= i1Max; i1++) {
             for (int i2 = 0; i2 <= i2Max; i2++) {
-                sum += probabilities[i1*(i2Max+1)+i2]*(i2);
+                for (int alpha = 0; alpha <= alphaLen; alpha++) {
+                    for (int beta = 0; beta <= betaLen; beta++) {
+                        sum += probabilities[i(i1, i2, alpha, beta)] * (i2);
+                    }
+                }
             }
         }
         return sum;
     }
 
     public static float averageSojournTime(float m, float lambda, float pi) {
-        return m/(lambda*(1-pi));
+        return m / (lambda * (1 - pi));
     }
 
     static int i(int i1, int i2, int alpha, int beta) {
         return
-                i1 * (Main.i2Len + 1)*(Main.alphaLen + 1)*(Main.betaLen + 1) +
-                i2*(Main.alphaLen + 1)*(Main.betaLen + 1) +
-                alpha*(Main.betaLen + 1) +
-                beta;
+                i1 * (Main.i2Len + 1) * (Main.alphaLen + 1) * (Main.betaLen + 1) +
+                        i2 * (Main.alphaLen + 1) * (Main.betaLen + 1) +
+                        alpha * (Main.betaLen + 1) +
+                        beta;
     }
 }
