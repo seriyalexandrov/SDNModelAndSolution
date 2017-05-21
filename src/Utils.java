@@ -33,7 +33,7 @@ public class Utils {
 
         for(int i = 0; i < size; i++) {
             System.out.println();
-            for (int col = 0; col < size; col++) {
+            for (int col = 0; col < size+1; col++) {
                 System.out.printf("%5.2f     ", m[i][col]);
             }
             System.out.println();

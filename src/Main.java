@@ -33,8 +33,8 @@ public class Main {
         createMatrix();
 //        Utils.printMatrix(matrix, i1Len, i2Len, alphaLen, betaLen);
         Utils.printMatrixSimple(matrix, size);
-//        float[] result = calcGaussZeidel();
-//        System.out.println("result: " + result);
+        float[] result = calcGaussZeidel();
+        Utils.printResult(result);
 //            float dropPercent = drop.percent(result);
 //            float drop1Percent = drop.percentD1(result);
 //            float drop2Percent = drop.percentD2(result);
@@ -75,10 +75,8 @@ public class Main {
         int rowToRemovePos = 0;
         int colToRemovePos = 0;
 
-        // re-initialise matrix with dimension i-1 , j-1
-        matrix = new float[size-nullableRows.size()][size-nullableCols.size()];
+        matrix = new float[size-nullableRows.size()][size-nullableCols.size()+1];
 
-        //row and column counter for the new matrix
         int tmpX=-1;
         int tmpY;
 
@@ -108,6 +106,9 @@ public class Main {
         }
 
         size = size-nullableRows.size();
+        for(int x = 0; x < size; x++) {
+            matrix[x][size] = 0;
+        }
     }
 
     private static void fillLeftPartCoefficientForState(int i1, int i2, int alpha, int beta) {
@@ -233,7 +234,7 @@ public class Main {
             if (error < epsilon) {
                 break;
             }
-            Utils.printResult(previousVariableValues);
+//            Utils.printResult(previousVariableValues);
             System.arraycopy(currentVariableValues, 0, previousVariableValues, 0, currentVariableValues.length);
         }
 
