@@ -2,13 +2,13 @@ import static java.lang.Math.pow;
 
 public class Main {
 
-    static float a = 0.01f;
-    static float b = 0.02f;
+    static float k = 1.5f;
+    static float lambda = 300;
 
     public static void main(String[] args) {
-        double f1 = moment(1);
-        double f2 = moment(2);
-        double f3 = moment(3);
+        double f1 = moment1();
+        double f2 = moment2();
+        double f3 = moment3();
         System.out.println("f1 = " + f1);
         System.out.println("f2 = " + f2);
         System.out.println("f3 = " + f3);
@@ -26,15 +26,20 @@ public class Main {
         System.out.println("y = " + y);
     }
 
-    private static double moment(int num) {
+    private static double moment1() {
+        return k/(lambda);
 
-        int factorial = 1;
-        for (int i = 1; i <= num; i++) {
-            factorial *= i;
-        }
-
-        return (pow(b, num+1) - pow(a, num+1)) / (factorial*(b-a)*(num+1));
     }
+
+    private static double moment2() {
+        return k*(k+1)/(2*lambda*lambda);
+    }
+
+    private static double moment3() {
+        return (k*(k+1)*(k+2))/(6*lambda*lambda*lambda);
+    }
+
+
 
     private static double D(double f1, double f2, double f3) {
         return 4*pow(f1, 3)*f3 + 4*pow(f2, 3) + pow(f3, 2) - 3*pow(f1*f2, 2) - 6*f1*f2*f3;
