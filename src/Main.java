@@ -8,7 +8,7 @@ public class Main {
     static float lambda = 500;
     static float[] alphas = new float[]{500};
     static float[] alphaP = new float[]{0}; //вероятность перехода на следующий этап обработки
-    static float[] betas = new float[]{450};
+    static float[] betas = new float[]{300};
     static float[] betaP = new float[]{0};
     static float q = 0.5f; // Вероятность ухода пакета из системы
     static int i1Len = 1; //состояние - длина первой очереди + количество в обработке на коммутаторе. 1 - один на обработке. 2 - 1 в очереди, один в обработке
