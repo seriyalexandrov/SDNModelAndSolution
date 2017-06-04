@@ -7,8 +7,8 @@ public class Main {
     private static float[][] matrix;
 
     static float lambda = 500;
-    static float[] alphas = new float[]{526, 273};
-    static float[] alphaP = new float[]{0.848f, 0}; //вероятность перехода на следующий этап обработки
+    static float[] alphas = new float[]{800, 800};
+    static float[] alphaP = new float[]{0.5f, 0}; //вероятность перехода на следующий этап обработки
     static float[] betas = new float[]{526, 273};
     static float[] betaP = new float[]{0.848f, 0};
     static float q = 0.5f; // Вероятность ухода пакета из системы
@@ -23,7 +23,6 @@ public class Main {
     static HashSet<Integer> nullableRows = new HashSet<>();
 
     public static void main(String[] args) {
-        System.gc();
 
         System.out.println("Length   dropped  dropped1  dropped2  buffer    buff1    buff2    sojourn");
         for (i1Len = 10; i1Len <= 100; i1Len += 10) {
