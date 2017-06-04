@@ -6,9 +6,9 @@ public class Main {
     private static float[][] matrix;
 
     static float lambda = 500;
-    static float[] alphas = new float[]{500, 500};
+    static float[] alphas = new float[]{500};
     static float[] alphaP = new float[]{0}; //вероятность перехода на следующий этап обработки
-    static float[] betas = new float[]{450, 450};
+    static float[] betas = new float[]{450};
     static float[] betaP = new float[]{0};
     static float q = 0.5f; // Вероятность ухода пакета из системы
     static int i1Len = 1; //состояние - длина первой очереди + количество в обработке на коммутаторе. 1 - один на обработке. 2 - 1 в очереди, один в обработке
@@ -24,11 +24,11 @@ public class Main {
     public static void main(String[] args) {
 
         System.out.println("Length   dropped  dropped1  dropped2  buffer    buff1    buff2    sojourn");
-        for (i1Len = 2; i1Len <= 10; i1Len += 1) {
+        for (i1Len = 10; i1Len <= 100; i1Len += 10) {
             i2Len = i1Len;
             size = (i1Len + 1) * (i2Len + 1) * (alphaLen + 1) * (betaLen + 1); //вычисляем размерность матрицы
             matrix = new float[size][size + 1];
-            drop = new Drop(i1Len, i2Len);
+            drop = new Drop(i1Len, i2Len, alphaLen, betaLen);
             createMatrix();
 //        Utils.printMatrix(matrix, i1Len, i2Len, alphaLen, betaLen);
 //            Utils.printMatrixSimple(matrix, size);

@@ -2,15 +2,19 @@ public class Drop {
 
     public int i1Treshold;
     public int i2Treshold;
+    private int alphaMax;
+    private int betaMax;
     public int i1Max;
     public int i2Max;
 
-    public Drop(int i1Max, int i2Max) {
+    public Drop(int i1Max, int i2Max, int alphaMax, int betaMax) {
         this.i1Max = i1Max;
         this.i2Max = i2Max;
 
         i1Treshold = Math.round(0.7f * (i1Max));
         i2Treshold = Math.round(0.7f * (i2Max));
+        this.alphaMax = alphaMax;
+        this.betaMax = betaMax;
     }
 
     public float p1(int i1) {
@@ -37,7 +41,11 @@ public class Drop {
         float sum = 0;
         for (int i1 = 0; i1 <= i1Max; i1++) {
             for (int i2 = 0; i2 <= i2Max; i2++) {
-                sum += probabilities[i1*(i2Max+1)+i2]*(p1(i1) + p2(i2));
+                for (int alpha = 0; alpha <= alphaMax; alpha++) {
+                    for (int beta = 0; beta <= betaMax; beta++) {
+                        sum += probabilities[Utils.i(i1, i2, alpha, beta)] * (p1(i1));
+                    }
+                }
             }
         }
         return sum;
@@ -48,7 +56,11 @@ public class Drop {
         float sum = 0;
         for (int i1 = 0; i1 <= i1Max; i1++) {
             for (int i2 = 0; i2 <= i2Max; i2++) {
-                sum += probabilities[i1*(i2Max+1)+i2]*(p1(i1));
+                for (int alpha = 0; alpha <= alphaMax; alpha++) {
+                    for (int beta = 0; beta <= betaMax; beta++) {
+                        sum += probabilities[Utils.i(i1, i2, alpha, beta)] * (p1(i1));
+                    }
+                }
             }
         }
         return sum;
@@ -59,7 +71,11 @@ public class Drop {
         float sum = 0;
         for (int i1 = 0; i1 <= i1Max; i1++) {
             for (int i2 = 0; i2 <= i2Max; i2++) {
-                sum += probabilities[i1*(i2Max+1)+i2]*(p2(i2));
+                for (int alpha = 0; alpha <= alphaMax; alpha++) {
+                    for (int beta = 0; beta <= betaMax; beta++) {
+                        sum += probabilities[Utils.i(i1, i2, alpha, beta)] * (p2(i2));
+                    }
+                }
             }
         }
         return sum;
