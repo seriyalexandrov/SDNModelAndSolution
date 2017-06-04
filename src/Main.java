@@ -1,3 +1,4 @@
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -6,15 +7,15 @@ public class Main {
     private static float[][] matrix;
 
     static float lambda = 500;
-    static float[] alphas = new float[]{500};
-    static float[] alphaP = new float[]{0}; //вероятность перехода на следующий этап обработки
-    static float[] betas = new float[]{300};
-    static float[] betaP = new float[]{0};
+    static float[] alphas = new float[]{526, 273};
+    static float[] alphaP = new float[]{0.848f, 0}; //вероятность перехода на следующий этап обработки
+    static float[] betas = new float[]{526, 273};
+    static float[] betaP = new float[]{0.848f, 0};
     static float q = 0.5f; // Вероятность ухода пакета из системы
     static int i1Len = 1; //состояние - длина первой очереди + количество в обработке на коммутаторе. 1 - один на обработке. 2 - 1 в очереди, один в обработке
     static int i2Len = 1; //состояние - длина второй очереди + количество в обработке на контроллере. 1 - один на обработке. 2 - 1 в очереди, один в обработке
-    static int alphaLen = 1;
-    static int betaLen = 1;
+    static int alphaLen = 2;
+    static int betaLen = 2;
     static float epsilon = 0.00001f; //необходимая точность
     static int size;
     static Drop drop;
@@ -22,6 +23,7 @@ public class Main {
     static HashSet<Integer> nullableRows = new HashSet<>();
 
     public static void main(String[] args) {
+        System.gc();
 
         System.out.println("Length   dropped  dropped1  dropped2  buffer    buff1    buff2    sojourn");
         for (i1Len = 10; i1Len <= 100; i1Len += 10) {
@@ -66,8 +68,8 @@ public class Main {
     private static void transformSystem() {
 
         assert nullableCols.size() == nullableRows.size();
-        List<Integer> rowsList = nullableRows.stream().collect(Collectors.toList());
-        List<Integer> colsList = nullableCols.stream().collect(Collectors.toList());
+        List<Integer> rowsList = nullableRows.stream().sorted().collect(Collectors.toList());
+        List<Integer> colsList = nullableCols.stream().sorted().collect(Collectors.toList());
 
         float[][] matrixCopy = matrix.clone();
 
@@ -80,8 +82,6 @@ public class Main {
         int tmpY;
 
 
-        //re-populate new matrix by searching through the original copy of matrix, while skipping useless row and column
-        // works only for 1 row and 1 column in a 2d array but by changing the conditional statement we can make it work for n number of rows or columns in a 2d array.
         for (int i = 0; i < size; i++) {
             tmpX++;
             if (rowToRemovePos < rowsList.size() && i == rowsList.get(rowToRemovePos)) {
@@ -90,7 +90,7 @@ public class Main {
             }
             tmpY = -1;
             colToRemovePos = 0;
-            for (int j = 0; j < size; j++) {
+            for (int j = 0; j < size+1; j++) {
                 tmpY++;
                 if (colToRemovePos < colsList.size() && j == colsList.get(colToRemovePos)) {
                     tmpY--;
@@ -253,7 +253,7 @@ public class Main {
     private static float[] trasformToFullResult(float[] previousVariableValues) {
         int localSize = (i1Len + 1) * (i2Len + 1) * (alphaLen + 1) * (betaLen + 1);
         float[] result = new float[localSize];
-        List<Integer> nullables = nullableRows.stream().collect(Collectors.toList());
+        List<Integer> nullables = nullableRows.stream().sorted().collect(Collectors.toList());
         int nullablesCount = 0;
         int nonnullCount = 0;
         for (int x = 0; x < localSize; x++) {
