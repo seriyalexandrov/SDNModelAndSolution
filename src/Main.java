@@ -7,10 +7,10 @@ public class Main {
     private static float[][] matrix;
 
     static float lambda = 500;
-    static float[] alphas = new float[]{800, 800};
-    static float[] alphaP = new float[]{0.5f, 0}; //вероятность перехода на следующий этап обработки
-    static float[] betas = new float[]{526, 273};
-    static float[] betaP = new float[]{0.848f, 0};
+    static float[] alphas = new float[]{1861, 743};
+    static float[] alphaP = new float[]{0.7f, 0}; //вероятность перехода на следующий этап обработки
+    static float[] betas = new float[]{1063, 290};
+    static float[] betaP = new float[]{0.7f, 0};
     static float q = 0.5f; // Вероятность ухода пакета из системы
     static int i1Len = 1; //состояние - длина первой очереди + количество в обработке на коммутаторе. 1 - один на обработке. 2 - 1 в очереди, один в обработке
     static int i2Len = 1; //состояние - длина второй очереди + количество в обработке на контроллере. 1 - один на обработке. 2 - 1 в очереди, один в обработке
@@ -25,7 +25,7 @@ public class Main {
     public static void main(String[] args) {
 
         System.out.println("Length   dropped  dropped1  dropped2  buffer    buff1    buff2    sojourn");
-        for (i1Len = 10; i1Len <= 100; i1Len += 10) {
+        for (i1Len = 40; i1Len <= 40; i1Len += 10) {
             i2Len = i1Len;
             size = (i1Len + 1) * (i2Len + 1) * (alphaLen + 1) * (betaLen + 1); //вычисляем размерность матрицы
             matrix = new float[size][size + 1];
